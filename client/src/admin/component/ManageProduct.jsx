@@ -10,7 +10,7 @@ function ManageProduct() {
   const getProducts = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:3001/products"
+        "https://github.com/Sahana606/minimalist-ecommerce-clone.git/products"
       );
       setProducts(res.data);
     } catch (err) {
@@ -25,7 +25,7 @@ function ManageProduct() {
   const deleteProduct = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:3001/delete-product/${id}`
+        `https://github.com/Sahana606/minimalist-ecommerce-clone.git/delete-product/${id}`
       );
       setProducts(products.filter((p) => p._id !== id));
     } catch (err) {
@@ -67,7 +67,7 @@ function ManageProduct() {
 
                   <td>
                     <img
-                      src={`http://localhost:3001/uploads/${p.image}`}
+                      src={`https://github.com/Sahana606/minimalist-ecommerce-clone.git/uploads/${p.image}`}
                       alt={p.name}
                       width="60"
                     />
