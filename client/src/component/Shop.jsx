@@ -14,7 +14,7 @@ function Shop() {
         try {
   
           const data = await axios.get(
-            "http://localhost:3001/admin/products"
+            "https://github.com/Sahana606/minimalist-ecommerce-clone.git/admin/products"
           );
   
           setproducts(data);
@@ -37,7 +37,7 @@ function Shop() {
       <div className="c1">
         {addproducts && addproducts?.data.map((product) => (
           <div className="card2">
-          <img src={`http://localhost:3001/uploads/${product.image}`} width="300" height="400" />
+          <img src={`https://github.com/Sahana606/minimalist-ecommerce-clone.git/uploads/${product.image}`} width="300" height="400" />
           <h2><b>{product.name}</b></h2>
            
         </div>
