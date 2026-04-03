@@ -22,7 +22,7 @@ function EditProduct() {
     const getProduct = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3001/products/${id}`
+          `https://github.com/Sahana606/minimalist-ecommerce-clone.git/products/${id}`
         );
 
         setProduct({
@@ -65,7 +65,7 @@ function EditProduct() {
 
     try {
       await axios.put(
-        `http://localhost:3001/admin/update-product/${id}`,
+        `https://github.com/Sahana606/minimalist-ecommerce-clone.git/admin/update-product/${id}`,
         formData
       );
 
