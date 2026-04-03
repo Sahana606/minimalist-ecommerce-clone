@@ -12,7 +12,7 @@ function EditUser() {
     useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/admin/manage-users");
+        const res = await axios.get("https://github.com/Sahana606/minimalist-ecommerce-clone.git/admin/manage-users");
         const user = res.data.find(u => u._id === id);
         if (user) setEmail(user.email);
         setLoading(false);
@@ -27,7 +27,7 @@ function EditUser() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:3001/update-user/${id}`, { email });
+      await axios.put(`https://github.com/Sahana606/minimalist-ecommerce-clone.git/update-user/${id}`, { email });
       alert("User updated successfully");
       navigate("/admin/manage-users");
     } catch (err) {
