@@ -25,7 +25,7 @@ function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
     );
 
     try {
-      await axios.post("http://localhost:3001/place-order", {
+      await axios.post("https://github.com/Sahana606/minimalist-ecommerce-clone.git/place-order", {
         user_id,
         email,
         items,
