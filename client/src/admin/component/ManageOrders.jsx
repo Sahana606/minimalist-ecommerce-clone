@@ -9,7 +9,7 @@ function ManageOrder() {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/admin/orders");
+        const res = await axios.get("https://github.com/Sahana606/minimalist-ecommerce-clone.git/admin/orders");
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -20,7 +20,7 @@ function ManageOrder() {
 
   const deleteOrder = async (orderId) => {
     try {
-      await axios.delete(`http://localhost:3001/delete-order/${orderId}`);
+      await axios.delete(`https://github.com/Sahana606/minimalist-ecommerce-clone.git/delete-order/${orderId}`);
       setOrders(prev => prev.filter(o => o._id !== orderId));
     } catch (err) {
       console.error("Error deleting order:", err);
