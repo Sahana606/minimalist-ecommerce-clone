@@ -32,7 +32,7 @@ function Otppage() {
 
     try {
       const res = await axios.post(
-        "http://127.0.0.1:3001/verify-otp",
+        "https://github.com/Sahana606/minimalist-ecommerce-clone.git/verify-otp",
         { email, otp: finalOtp }
       );
 
@@ -65,7 +65,7 @@ function Otppage() {
  
   const handleResend = async () => {
     try {
-      await axios.post("http://127.0.0.1:3001/resend-otp", { email });
+      await axios.post("https://github.com/Sahana606/minimalist-ecommerce-clone.git/resend-otp", { email });
       setCounter(60); 
     } catch (err) {
       console.log(err);
