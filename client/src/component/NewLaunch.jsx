@@ -10,7 +10,7 @@ function NewLaunch({ addToCart }) {
       try {
 
         const data = await axios.get(
-          "http://localhost:3001/products"
+          "https://github.com/Sahana606/minimalist-ecommerce-clone.git/products"
         );
 
         setproducts(data);
@@ -37,7 +37,7 @@ function NewLaunch({ addToCart }) {
             <div className="card2" key={product._id}>
 
               <img
-                src={`http://localhost:3001/uploads/${product.image}`}
+                src={`https://github.com/Sahana606/minimalist-ecommerce-clone.git/uploads/${product.image}`}
                 width="300"
                 height="400"
                 alt=""
