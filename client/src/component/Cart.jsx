@@ -37,7 +37,7 @@ function Cart() {
         0
       );
 
-      await axios.post("http://localhost:3001/place-order", {
+      await axios.post("https://github.com/Sahana606/minimalist-ecommerce-clone.git/place-order", {
         user_id,
         email,
         items,
@@ -89,7 +89,7 @@ function Cart() {
                 src={
                   item.images
                     ? item.images[0]
-                    : `http://localhost:3001/uploads/${item.image}`
+                    : `https://github.com/Sahana606/minimalist-ecommerce-clone.git/uploads/${item.image}`
                 }
                 alt={item.name}
               />
