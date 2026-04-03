@@ -13,7 +13,7 @@ function EditOrder() {
     const getOrder = async () => {
       try {
         console.log("Fetching Order ID:", id);
-        const res = await axios.get(`http://localhost:3001/user-orders/${id}`);
+        const res = await axios.get(`https://github.com/Sahana606/minimalist-ecommerce-clone.git/user-orders/${id}`);
         setOrder(res.data);
         setStatus(res.data.status);
       } catch (err) {
@@ -27,7 +27,7 @@ function EditOrder() {
   const updateOrder = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:3001/admin/update-order/${id}`, {
+      await axios.put(`https://github.com/Sahana606/minimalist-ecommerce-clone.git/admin/update-order/${id}`, {
         status
       });
       alert("Order updated successfully");
@@ -67,7 +67,7 @@ function EditOrder() {
                 order.items.map((item, idx) => (
                   <div key={idx} style={{ display: "flex", marginBottom: "5px" }}>
                     <td><img
-                      src={`http://localhost:3001/uploads/${item.image}`}
+                      src={`https://github.com/Sahana606/minimalist-ecommerce-clone.git/uploads/${item.image}`}
                       
                       width="50"
                       style={{ marginRight: "5px" }}
