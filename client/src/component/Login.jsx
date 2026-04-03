@@ -32,7 +32,7 @@ function Login() {
     if (!validateEmail(email)) return;
 
     try {
-      await axios.post("http://127.0.0.1:3001/login", { email });
+      await axios.post("https://github.com/Sahana606/minimalist-ecommerce-clone.git", { email });
 
       
       localStorage.setItem("otpEmail", email);
