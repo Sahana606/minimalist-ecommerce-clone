@@ -41,7 +41,7 @@ function AddProduct() {
 
     try {
       await axios.post(
-        "http://localhost:3001/admin/add-product",
+        "https://github.com/Sahana606/minimalist-ecommerce-clone.git/admin/add-product",
         formData,
         {
           headers: {
