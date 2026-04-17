@@ -56,7 +56,7 @@ function App() {
       element={<ProductDetails addToCart={addToCart} />}
     />
        
-        <Route path="/adminLogin" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminDashboard />} />
         {/* <Route path="/admin/add-product" element={<AddProduct />} /> */}
         <Route path="/admin/manage-order" element={<ManageOrders />} />
