@@ -57,7 +57,7 @@ function App() {
     />
        
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/admindashboard" element={<AdminDashboard />} />
         {/* <Route path="/admin/add-product" element={<AddProduct />} /> */}
         <Route path="/admin/manage-order" element={<ManageOrders />} />
 
