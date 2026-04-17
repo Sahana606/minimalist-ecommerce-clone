@@ -37,7 +37,7 @@ function Shop() {
       <div className="c1">
         {addproducts && addproducts?.data.map((product) => (
           <div className="card2">
-          <img src={`http://localhost:3001/uploads/${product.image}`} width="300" height="400" />
+          <img src={`minimalist-ecommerce-clone.onrender.com/uploads/${product.image}`} width="300" height="400" />
           <h2><b>{product.name}</b></h2>
            
         </div>
