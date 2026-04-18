@@ -69,7 +69,7 @@ const OrderModel = mongoose.model("Order", orderSchema);
 app.use(express.json());
 const allowedOrigins=[
   "http://localhost:5173",
-  "https://minimalist-ecommerce-clone.onrender.com"
+  "https://minimalist-ecommerce-clone-1.onrender.com"
 ];
 
 app.use(cors({
