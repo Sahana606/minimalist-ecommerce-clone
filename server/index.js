@@ -9,7 +9,10 @@ const path = require("path");
 // const productRoutes = require("./models/addproduct");
 const router = express.Router();
 const Product = require("./models/addproduct");
+// import { v2 as cloudinary } from "cloudinary";
 
+const cloudinary=require("cloudinary").v2;
+const {CloudinaryStorage}=require("multer-storage-cloudinary")
 
 
 const app = express();
@@ -33,6 +36,20 @@ const orderSchema = new mongoose.Schema({
   datetime: { type: Date, default: Date.now },
 });
 
+const parser= multer({
+  storage:new CloudinaryStorage({
+    cloudinary,
+    params:{
+      folder:"products",
+      format:async(req,file)=>{
+        const ext=file.mimetype.split("/")[1].toLowerCase();
+        const allowedFormats=["jpeg","jpg","png","webp"];
+        return allowedFormats.includes(ext)?ext:"png";
+      },
+      public_id:(req,file)=>`${Date.now()}-${file.originalname.replace(/\s+/g,"_")}`
+    }
+  })
+});
 
 
 
@@ -53,7 +70,7 @@ const OrderModel = mongoose.model("Order", orderSchema);
 app.use(express.json());
 const allowedOrigins=[
   "http://localhost:5173",
-  "https://minimalist-ecommerce-clone-1.onrender.com"
+  "https://minimalist-ecommerce-clone.onrender.com"
 ];
 
 app.use(cors({
@@ -66,6 +83,17 @@ app.use(cors({
     }
   },credentials:true
 }));
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+
+
+
+
 
 
 app.use("/uploads", express.static("uploads"));
@@ -218,7 +246,7 @@ app.get("/admin/orders", async (req, res) => {
   }
 });
 
-app.post("/admin/add-product", upload.single("image"), async (req, res) => {
+app.post("/admin/add-product", parser.single("image"), async (req, res) => {
   try {
     const product = new Product({
       name: req.body.name,
