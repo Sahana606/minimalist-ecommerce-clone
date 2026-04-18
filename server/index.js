@@ -238,6 +238,7 @@ app.post("/place-order", async (req, res) => {
 app.get("/admin/orders", async (req, res) => {
   try {
     const orders = await OrderModel.find().sort({ datetime: -1 });
+    const products = await Product.find();
     res.json(orders);
   } catch (err) {
     console.error(err);
