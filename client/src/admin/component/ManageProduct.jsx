@@ -67,7 +67,7 @@ function ManageProduct() {
 
                   <td>
                     <img
-                      src={p.image}
+                      src={`https://res.cloudinary.com/dmgb9kpjg/image/upload/v1776512596/products/{p.image}`}
                       alt={p.name}
                       width="60"
                     />
