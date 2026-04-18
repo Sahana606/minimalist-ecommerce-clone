@@ -67,7 +67,7 @@ function ManageProduct() {
 
                   <td>
                     <img
-                      src={`https://minimalist-ecommerce-clone.onrender.com/uploads/${p.image}`}
+                      src={p.image}
                       alt={p.name}
                       width="60"
                     />
