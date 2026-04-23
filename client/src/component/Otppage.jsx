@@ -42,7 +42,9 @@ function Otppage() {
       localStorage.setItem("email", res.data.email);
       localStorage.setItem("user_id", res.data.user_id || "");
       localStorage.removeItem("otpEmail");
-      navigate("/");
+      console.log("Going to profile...");
+navigate("/profile");
+     
 
     } catch (err) {
       setError(err.response?.data?.error || "Invalid OTP");
@@ -65,7 +67,7 @@ function Otppage() {
  
   const handleResend = async () => {
     try {
-      await axios.post("minimalist-ecommerce-clone.onrender.com/resend-otp", { email });
+      await axios.post("http://127.0.0.1:3001/resend-otp", { email });
       setCounter(60); 
     } catch (err) {
       console.log(err);
