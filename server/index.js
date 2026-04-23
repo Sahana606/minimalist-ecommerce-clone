@@ -122,20 +122,6 @@ async function sendMail(to, subject, html) {
   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, html });
 }
 
-app.get("/user/:email", async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.params.email });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.json(user);
-
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
 app.put("/user/:email", async (req, res) => {
   try {
     const updatedUser = await User.findOneAndUpdate(
@@ -143,13 +129,7 @@ app.put("/user/:email", async (req, res) => {
       req.body,
       { new: true }
     );
-
-    if (!updatedUser) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
     res.json(updatedUser);
-
   } catch (err) {
     res.status(500).json({ error: "Update failed" });
   }
@@ -186,39 +166,17 @@ app.post("/login", async (req, res) => {
 app.post("/verify-otp", async (req, res) => {
   try {
     const { email, otp } = req.body;
-
-    const existingUser = await User.findOne({ email });
-
-    
-    if (!existingUser) {
-      return res.status(400).json({ error: "User not found" });
-    }
-
-    
-    if (existingUser.otp !== otp) {
+    const user = await UserModel.findOne({ email });
+    if (!user || user.otp !== otp || user.otpExpires < new Date()) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
-
-   
-    let user = await User.findOne({ email });
-
-    if (!user.firstName) {
-      user.firstName = "";
-      user.lastName = "";
-      user.phone = "";
-      await user.save();
-    }
-
-    res.json({
-      email: user.email,
-      user_id: user._id
-    });
-
+    res.json({ email: user.email, user_id: user._id });
   } catch (err) {
-    console.log("OTP ERROR:", err); 
+    console.error(err);
     res.status(500).json({ error: "Server error" });
   }
 });
+
 app.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
