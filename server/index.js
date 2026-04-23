@@ -189,21 +189,23 @@ app.post("/verify-otp", async (req, res) => {
 
     const existingUser = await User.findOne({ email });
 
-    if (!existingUser || existingUser.otp !== otp) {
+    
+    if (!existingUser) {
+      return res.status(400).json({ error: "User not found" });
+    }
+
+    
+    if (existingUser.otp !== otp) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
    
     let user = await User.findOne({ email });
 
-    if (!user) {
-      user = new User({
-        email,
-        firstName: "",
-        lastName: "",
-        phone: ""
-      });
-
+    if (!user.firstName) {
+      user.firstName = "";
+      user.lastName = "";
+      user.phone = "";
       await user.save();
     }
 
@@ -213,7 +215,7 @@ app.post("/verify-otp", async (req, res) => {
     });
 
   } catch (err) {
-    console.log(err);
+    console.log("OTP ERROR:", err); 
     res.status(500).json({ error: "Server error" });
   }
 });
