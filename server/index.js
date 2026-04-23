@@ -90,11 +90,6 @@ cloudinary.config({
 });
 
 
-
-
-
-
-
 app.use("/uploads", express.static("uploads"));
 console.log("MongoDB URI:", process.env.ADMIN_DB_URI);
 
@@ -127,6 +122,39 @@ async function sendMail(to, subject, html) {
   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, html });
 }
 
+app.get("/user/:email", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
+
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
+app.put("/user/:email", async (req, res) => {
+  try {
+    const updatedUser = await User.findOneAndUpdate(
+      { email: req.params.email },
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(updatedUser);
+
+  } catch (err) {
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
 app.post("/login", async (req, res) => {
   try {
     const { email } = req.body;
@@ -158,17 +186,37 @@ app.post("/login", async (req, res) => {
 app.post("/verify-otp", async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const user = await UserModel.findOne({ email });
-    if (!user || user.otp !== otp || user.otpExpires < new Date()) {
+
+    const existingUser = await User.findOne({ email });
+
+    if (!existingUser || existingUser.otp !== otp) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
-    res.json({ email: user.email, user_id: user._id });
+
+   
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        email,
+        firstName: "",
+        lastName: "",
+        phone: ""
+      });
+
+      await user.save();
+    }
+
+    res.json({
+      email: user.email,
+      user_id: user._id
+    });
+
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({ error: "Server error" });
   }
 });
-
 app.get("/products", async (req, res) => {
   try {
     const products = await Product.find();
@@ -197,6 +245,7 @@ app.get("/admin/manage-users", async (req, res) => {
     res.status(500).json({ error: "Error fetching users" });
   }
 });
+
 app.post("/resend-otp", async (req, res) => {
   try {
     const { email } = req.body;
@@ -255,7 +304,7 @@ app.post("/admin/add-product", parser.single("image"), async (req, res) => {
       price: req.body.price,
       section: req.body.section,
       description: req.body.description,
-      image: req.file ? req.file.filename : "",
+      image: req.file ? req.file.path : "",
     });
 
     await product.save();
