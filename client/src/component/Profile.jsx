@@ -24,7 +24,10 @@ function Profile() {
         const res = await axios.get(
           `https://minimalist-ecommerce-clone.onrender.com/user/${email}`
         );
-        setUser(res.data);
+       setUser({
+  ...res.data,
+  email: email, // force email from localStorage
+});
       } catch (err) {
         console.log(err);
       }
@@ -42,21 +45,25 @@ function Profile() {
   };
 
   
-  const handleSave = async () => {
-    try {
-      await axios.put(
-  `https://minimalist-ecommerce-clone.onrender.com/user/${email}`,
-  user
-);
+const handleSave = async () => {
+  try {
+    console.log("Sending data:", user);
 
-      alert("Profile saved successfully ");
+    const res = await axios.put(
+      `https://minimalist-ecommerce-clone.onrender.com/user/${email}`,
+      user
+    );
 
-      setIsEditing(false); 
-    } catch (err) {
-      console.log("ERROR:", err.response?.data || err.message);
-      alert("Failed to save ");
-    }
-  };
+    console.log("Response:", res.data);
+
+    alert("Profile saved successfully");
+    setIsEditing(false);
+
+  } catch (err) {
+    console.log("FULL ERROR:", err.response);
+    alert("Failed to save");
+  }
+};
 
   return (
     <div className="profile-container">
@@ -72,8 +79,11 @@ function Profile() {
           <li>Addresses</li>
           <li
             onClick={() => {
-              localStorage.clear();
-              navigate("/login");
+              localStorage.removeItem("email");
+localStorage.removeItem("user_id");
+
+navigate("/");
+              
             }}
             style={{ color: "red", cursor: "pointer" }}
           >
@@ -82,7 +92,7 @@ function Profile() {
         </ul>
       </div>
 
-      {/* ===== Main Content ===== */}
+     
       <div className="profile-content">
 
        
@@ -118,11 +128,10 @@ function Profile() {
             disabled={!isEditing}
             placeholder="Last Name"
           />
-
-          <input
-  name="email"
-  value={user.email || ""}
-  onChange={handleChange}
+<input
+  value={email}
+  disabled
+  placeholder="Email"
 />
 
           <input
