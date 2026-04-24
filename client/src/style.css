@@ -1343,3 +1343,15 @@ body.no-scroll {
     grid-template-columns: 1fr;
   }
 }
+
+.order-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 15px;
+}
+
+.order-item {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
