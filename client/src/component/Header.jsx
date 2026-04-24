@@ -9,7 +9,7 @@ function Header({ setShowCart }) {
   const [results, setResults] = useState([]);
 
   const navigate = useNavigate();
-
+ const email = localStorage.getItem("email");
   
   useEffect(() => {
     const fetchProducts = async () => {
@@ -65,9 +65,11 @@ function Header({ setShowCart }) {
             style={{ cursor: "pointer" }}
           ></i>
 
-          <Link to="/login">
-            <i className="fa-regular fa-user"></i>
-          </Link>
+         
+
+<Link to={email ? "/profile" : "/login"}>
+  <i className="fa-regular fa-user"></i>
+</Link>
 
           <i
             className="fa-solid fa-cart-arrow-down"
