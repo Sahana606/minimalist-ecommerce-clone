@@ -122,17 +122,22 @@ async function sendMail(to, subject, html) {
   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, html });
 }
 
-app.get("/user/:email", async (req, res) => {
+app.get("/user-orders/:email", async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.params.email });
+    const email = req.params.email.trim().toLowerCase();
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    console.log("Searching for:", email);
 
-    res.json(user);
+    const orders = await OrderModel.find({
+      email: { $regex: new RegExp("^" + email + "$", "i") }
+    });
+
+    console.log("Orders found:", orders);
+
+    res.json(orders);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.log(err);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
@@ -268,9 +273,20 @@ app.post("/resend-otp", async (req, res) => {
 app.post("/place-order", async (req, res) => {
   try {
     const { user_id, email, items, totalPrice } = req.body;
-    const order = new OrderModel({ user_id, email, items, totalPrice });
+
+    const order = new OrderModel({
+      user_id,
+      email: email.trim().toLowerCase(), // ✅ FIX HERE
+      items,
+      totalPrice
+    });
+
     await order.save();
+
+    console.log("Saved order:", order);
+
     res.json({ message: "Order placed successfully" });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -312,7 +328,7 @@ app.post("/admin/add-product", parser.single("image"), async (req, res) => {
 });
 
 
-app.get("/user-orders/:id", async (req, res) => {
+app.get("/order/:id", async (req, res) => {
   try {
     const order = await OrderModel.findById(req.params.id);
     if (!order) return res.status(404).json({ error: "Order not found" });
