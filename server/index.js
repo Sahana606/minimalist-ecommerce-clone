@@ -122,16 +122,39 @@ async function sendMail(to, subject, html) {
   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, html });
 }
 
+app.get("/user/:email", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.put("/user/:email", async (req, res) => {
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { email: req.params.email },
+    const { email } = req.params;
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { email: email },
       req.body,
       { new: true }
     );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     res.json(updatedUser);
+
   } catch (err) {
-    res.status(500).json({ error: "Update failed" });
+    console.error("UPDATE ERROR:", err);
+    res.status(500).json({ error: "Server error while updating" });
   }
 });
 
@@ -166,11 +189,23 @@ app.post("/login", async (req, res) => {
 app.post("/verify-otp", async (req, res) => {
   try {
     const { email, otp } = req.body;
-    const user = await UserModel.findOne({ email });
+
+    let user = await UserModel.findOne({ email });
+
     if (!user || user.otp !== otp || user.otpExpires < new Date()) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
+
+    // ✅ CREATE USER IF NOT EXISTS
+    if (!user.firstName) {
+      user.firstName = "";
+      user.lastName = "";
+      user.phone = "";
+      await user.save();
+    }
+
     res.json({ email: user.email, user_id: user._id });
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Server error" });
