@@ -5,38 +5,57 @@ import "../style.css";
 
 function Profile() {
   const [user, setUser] = useState({});
-  const [isEditing, setIsEditing] = useState(true);
+  const [orders, setOrders] = useState([]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState("profile");
+
   const navigate = useNavigate();
-
   const email = localStorage.getItem("email");
+  console.log("Frontend email:", email);
 
-  
+ 
   useEffect(() => {
     if (!email) {
       navigate("/login");
     }
   }, [email, navigate]);
 
- 
   useEffect(() => {
     const getUser = async () => {
       try {
         const res = await axios.get(
           `https://minimalist-ecommerce-clone.onrender.com/user/${email}`
         );
-       setUser({
-  ...res.data,
-  email: email, // force email from localStorage
-});
+
+        setUser({
+          ...res.data,
+          email: email, 
+        });
       } catch (err) {
-        console.log(err);
+        console.log("User fetch error:", err);
       }
     };
 
     if (email) getUser();
   }, [email]);
 
-  
+ 
+  useEffect(() => {
+    const getOrders = async () => {
+      try {
+        const res = await axios.get(
+          `https://minimalist-ecommerce-clone.onrender.com/user-orders/${email}`
+        );
+        setOrders(res.data);
+      } catch (err) {
+        console.log("Orders error:", err);
+      }
+    };
+
+    if (email) getOrders();
+  }, [email]);
+
+ 
   const handleChange = (e) => {
     setUser({
       ...user,
@@ -45,25 +64,23 @@ function Profile() {
   };
 
   
-const handleSave = async () => {
-  try {
-    console.log("Sending data:", user);
+  const handleSave = async () => {
+    try {
+      await axios.put(
+        `https://minimalist-ecommerce-clone.onrender.com/user/${email}`,
+        {
+          ...user,
+          email: email,
+        }
+      );
 
-    const res = await axios.put(
-      `https://minimalist-ecommerce-clone.onrender.com/user/${email}`,
-      user
-    );
-
-    console.log("Response:", res.data);
-
-    alert("Profile saved successfully");
-    setIsEditing(false);
-
-  } catch (err) {
-    console.log("FULL ERROR:", err.response);
-    alert("Failed to save");
-  }
-};
+      alert("Profile saved successfully");
+      setIsEditing(false);
+    } catch (err) {
+      console.log("Save error:", err.response?.data || err.message);
+      alert("Failed to save");
+    }
+  };
 
   return (
     <div className="profile-container">
@@ -74,16 +91,14 @@ const handleSave = async () => {
         <p>{user.email}</p>
 
         <ul>
-          <li className="active">Profile</li>
-          <li>My Orders</li>
+          <li onClick={() => setActiveTab("profile")}>Profile</li>
+          <li onClick={() => setActiveTab("orders")}>My Orders</li>
           <li>Addresses</li>
           <li
             onClick={() => {
               localStorage.removeItem("email");
-localStorage.removeItem("user_id");
-
-navigate("/");
-              
+              localStorage.removeItem("user_id");
+              navigate("/");
             }}
             style={{ color: "red", cursor: "pointer" }}
           >
@@ -92,59 +107,88 @@ navigate("/");
         </ul>
       </div>
 
-     
       <div className="profile-content">
 
-       
-        {isEditing ? (
-          <button className="edit-btn" onClick={handleSave}>
-            Save
-          </button>
-        ) : (
-          <button
-            className="edit-btn"
-            onClick={() => setIsEditing(true)}
-          >
-            Edit
-          </button>
+        {activeTab === "profile" && (
+          <div>
+
+            {isEditing ? (
+              <button className="edit-btn" onClick={handleSave}>
+                Save
+              </button>
+            ) : (
+              <button
+                className="edit-btn"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+            )}
+
+            <h2>Profile Details</h2>
+
+            <div className="form">
+              <input
+                name="firstName"
+                value={user.firstName || ""}
+                onChange={handleChange}
+                disabled={!isEditing}
+                placeholder="First Name"
+              />
+
+              <input
+                name="lastName"
+                value={user.lastName || ""}
+                onChange={handleChange}
+                disabled={!isEditing}
+                placeholder="Last Name"
+              />
+
+              <input value={email} disabled />
+
+              <input
+                name="phone"
+                value={user.phone || ""}
+                onChange={handleChange}
+                disabled={!isEditing}
+                placeholder="Phone"
+              />
+            </div>
+          </div>
         )}
 
-        <h2>Profile Details</h2>
+       
+        {activeTab === "orders" && (
+          <div>
+            <h2>My Orders</h2>
 
-        <div className="form">
+            {orders.length === 0 ? (
+              <p>No orders found</p>
+            ) : (
+              orders.map((order) => (
+                <div key={order._id} className="order-card">
 
-          <input
-            name="firstName"
-            value={user.firstName || ""}
-            onChange={handleChange}
-            disabled={!isEditing}
-            placeholder="First Name"
-          />
+                  <h4>Total: ₹{order.totalPrice}</h4>
+                  <p>{new Date(order.datetime).toLocaleString()}</p>
 
-          <input
-            name="lastName"
-            value={user.lastName || ""}
-            onChange={handleChange}
-            disabled={!isEditing}
-            placeholder="Last Name"
-          />
-<input
-  value={email}
-  disabled
-  placeholder="Email"
-/>
+                  {order.items.map((item, index) => (
+                    <div key={index} className="order-item">
+                      <img src={item.image} width="80" alt="" />
+                      <div>
+                        <p>{item.productName}</p>
+                        <p>Qty: {item.quantity}</p>
+                        <p>₹{item.price}</p>
+                      </div>
+                    </div>
+                  ))}
 
-          <input
-            name="phone"
-            value={user.phone || ""}
-            onChange={handleChange}
-            disabled={!isEditing}
-            placeholder="Phone"
-          />
+                </div>
+              ))
+            )}
+          </div>
+        )}
 
-        </div>
       </div>
-
     </div>
   );
 }
