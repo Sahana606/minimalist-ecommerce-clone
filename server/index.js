@@ -10,10 +10,14 @@ const path = require("path");
 const router = express.Router();
 const Product = require("./models/addproduct");
 // import { v2 as cloudinary } from "cloudinary";
-
+const Razorpay=require("razorpay");
 const cloudinary=require("cloudinary").v2;
 const {CloudinaryStorage}=require("multer-storage-cloudinary")
 
+const razorpay=new Razorpay({
+  key_id:process.env.RAZORPAY_KEY_ID,
+   key_secret:process.env.RAZORPAY_KEY_SECRET,
+});
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -48,6 +52,54 @@ const parser= multer({
       public_id:(req,file)=>`${Date.now()}-${file.originalname.replace(/\s+/g,"_")}`
     }
   })
+});
+
+
+app.post("/place-order", async (req, res) => {
+  try {
+    const { user_id, email, items, totalPrice, 
+      paymentMethod,
+      paymentStatus,
+      razorpay_order_id,
+      razorpay_payment_id, } = req.body;
+
+    const order = new OrderModel({
+      user_id,
+      email: email.trim().toLowerCase(),
+      items,
+      totalPrice,
+      paymentMethod,
+      paymentStatus,
+      razorpay_order_id,
+      razorpay_payment_id,
+    });
+
+    await order.save();
+
+    console.log("Saved order:", order);
+
+    res.json({ message: "Order placed successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/create-razorpay-order",async(req,res)=>{
+  try{
+    const {amount}=req.body;
+    const options={
+      amount:amount*100,
+      currency:"INR",
+      receipt:"order_"+Date.now()
+    };
+    const order=await razorpay.orders.create(options);
+    res.json(order);
+  }catch(err){
+    console.error("Razorpay error:",err);
+    res.status(500).json({error:"Payment creation failed"});
+  }
 });
 
 
@@ -201,7 +253,7 @@ app.post("/verify-otp", async (req, res) => {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
-    // ✅ CREATE USER IF NOT EXISTS
+    
     if (!user.firstName) {
       user.firstName = "";
       user.lastName = "";
@@ -270,28 +322,7 @@ app.post("/resend-otp", async (req, res) => {
   }
 });
 
-app.post("/place-order", async (req, res) => {
-  try {
-    const { user_id, email, items, totalPrice } = req.body;
 
-    const order = new OrderModel({
-      user_id,
-      email: email.trim().toLowerCase(), // ✅ FIX HERE
-      items,
-      totalPrice
-    });
-
-    await order.save();
-
-    console.log("Saved order:", order);
-
-    res.json({ message: "Order placed successfully" });
-
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
 
 
 
