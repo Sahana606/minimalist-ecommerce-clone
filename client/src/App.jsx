@@ -20,6 +20,7 @@ import ManageUsers from "./admin/component/ManageUsers";
 import AddProduct from "./admin/component/AddProduct";
 import EditProduct from "./admin/component/EditProduct";
 import CartSidebar from "./component/CartSidebar";
+import Payment from "./component/Payment";
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -46,7 +47,7 @@ const isLoggedIn = localStorage.getItem("email");
   path="/profile"
   element={isLoggedIn ? <Profile /> : <Login />}
 />
-
+ <Route path="/payment" element={<Payment />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/best" element={<Best />} />
         <Route path="/care" element={<Care />} />
