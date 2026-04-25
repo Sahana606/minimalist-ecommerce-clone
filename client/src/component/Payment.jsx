@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import axios from "axios";
-import { CartContext } from "./component/CartSidebar";
+
 import { useNavigate, useLocation } from "react-router-dom";
 
 function Payment() {
