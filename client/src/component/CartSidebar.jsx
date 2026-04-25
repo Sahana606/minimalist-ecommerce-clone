@@ -2,11 +2,11 @@ import React from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
-
+const navigate = useNavigate();
   const placeOrder = async () => {
     const email = localStorage.getItem("email");
     const user_id = localStorage.getItem("user_id");
-    const navigate = useNavigate();
+    
 
     if (!email || !user_id) {
       alert("You must log in first!");
@@ -94,15 +94,15 @@ function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
           ))
         )}
       </div>
+<div className="cart-footer"> 
+  <h3>Total: ₹{total}</h3> 
+  <button 
+        className="buy-btn" 
+       onClick={() => { navigate("/payment") }}>
+        Proceed
+      </button> 
+</div>
 
-      <div className="cart-footer">
-        <h3>Total: ₹{total}</h3>
-        <button className="buy-btn" onClick={()=>{
-          navigate("/payment");
-        }}>Proced</button>          
-        {/* onClick={placeOrder} */}
-
-      </div>
     </div>
   );
 }
