@@ -15,10 +15,16 @@ const OrderSchema = new mongoose.Schema({
     },
   ],
   totalPrice: Number,
+  paymentMethod: {
+    type:String
+  },
+  razorpay_order_id:String,
+  razorpay_payment_id:String,
   status: {
     type: String,
     default: "Pending",
   },
+
   datetime: {
     type: Date,
     default: Date.now,
