@@ -45,7 +45,7 @@ const navigate = useNavigate();
 >
 
               <img
-                src={`https://minimalist-ecommerce-clone.onrender.com/uploads/${product.image}`}
+                src={product.image}
                 width="300"
                 height="400"
                 alt=""
