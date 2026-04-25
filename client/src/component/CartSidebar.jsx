@@ -98,7 +98,7 @@ function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
       <div className="cart-footer">
         <h3>Total: ₹{total}</h3>
         <button className="buy-btn" onClick={()=>{
-          Navigate("/payment");
+          navigate("/payment");
         }}>Proced</button>          
         {/* onClick={placeOrder} */}
 
