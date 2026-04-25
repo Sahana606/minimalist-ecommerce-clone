@@ -1,11 +1,12 @@
 import React from "react";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
 
   const placeOrder = async () => {
     const email = localStorage.getItem("email");
     const user_id = localStorage.getItem("user_id");
+    const navigate = useNavigate();
 
     if (!email || !user_id) {
       alert("You must log in first!");
