@@ -8,7 +8,7 @@ function Payment() {
   const user_id = localStorage.getItem("user_id");
   const email = localStorage.getItem("email");
   const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [address, setAddress] = useState(location.state?.address);
+
 
 
    const placeOrder = async () => {
@@ -51,10 +51,7 @@ function Payment() {
   };
 
   const handleOnlinePayment = async () => {
-    if (!address) {
-      alert("Address missing");
-      return;
-    }
+    
 
     const { data } = await axios.post("https://minimalist-ecommerce-clone.onrender.com",{ amount: total });
     const options = {
@@ -89,7 +86,7 @@ function Payment() {
           Pay Online (UPI / Card / NetBanking)
         </label>
 
-        <button className="pay-btn" disabled={!address} onClick={() => {
+        <button className="pay-btn"  onClick={() => {
             if (paymentMethod === "COD") {
               placeOrder();
             } else {
