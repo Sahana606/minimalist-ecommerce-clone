@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
 const navigate = useNavigate();
+const [message, setMessage] = useState("");
   const placeOrder = async () => {
     const email = localStorage.getItem("email");
     const user_id = localStorage.getItem("user_id");
@@ -66,6 +67,7 @@ const navigate = useNavigate();
 
   return (
     <div className={`cart-sidebar ${showCart ? "active" : ""}`}>
+      {message && <div className="toast">{message}</div>}
       <div className="cart-header">
         <h2>Your Cart</h2>
         <button onClick={() => setShowCart(false)}>X</button>
@@ -96,11 +98,17 @@ const navigate = useNavigate();
       </div>
 <div className="cart-footer"> 
   <h3>Total: ₹{total}</h3> 
-  <button 
-        className="buy-btn" 
-       onClick={() => { navigate("/payment") }}>
-        Proceed
-      </button> 
+ <button 
+  className="buy-btn" 
+  onClick={() => {
+    setMessage("Proceeding to address page...");
+    setTimeout(() => {
+      navigate("/address");
+    }, 1000);
+  }}
+>
+  Proceed
+</button>
 </div>
 
     </div>
