@@ -3,11 +3,16 @@ import axios from "axios";
 
 import { useNavigate, useLocation } from "react-router-dom";
 
-function Payment() {
+function Payment({ cart, setCart, setShowCart }) {
   const navigate = useNavigate();
   const user_id = localStorage.getItem("user_id");
   const email = localStorage.getItem("email");
   const [paymentMethod, setPaymentMethod] = useState("COD");
+  const address = JSON.parse(localStorage.getItem("address"));
+  const total = cart.reduce(
+  (sum, item) => sum + Number(item.price) * (item.qty || 1),
+  0
+);
 
 
 
@@ -32,14 +37,15 @@ function Payment() {
       0
     );
 
-    try {
-      await axios.post("https://minimalist-ecommerce-clone.onrender.com/place-order", {
-        user_id,
-        email,
-        items,
-        totalPrice,
-        datetime: new Date()
-      });
+  try {
+  await axios.post("https://minimalist-ecommerce-clone.onrender.com/place-order", {
+    user_id,
+    email,
+    items,
+    totalPrice,
+    address, 
+    datetime: new Date()
+  });
 
       alert("Order placed successfully");
       setCart([]);
