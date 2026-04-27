@@ -13,7 +13,7 @@ const Product = require("./models/addproduct");
 const Razorpay=require("razorpay");
 const cloudinary=require("cloudinary").v2;
 const {CloudinaryStorage}=require("multer-storage-cloudinary")
-
+const sgMail = require("@sendgrid/mail");
 const razorpay=new Razorpay({
   key_id:process.env.RAZORPAY_KEY_ID,
    key_secret:process.env.RAZORPAY_KEY_SECRET,
@@ -57,11 +57,17 @@ const parser= multer({
 
 app.post("/place-order", async (req, res) => {
   try {
-    const { user_id, email, items, totalPrice, 
+    const { 
+      user_id, 
+      email, 
+      items, 
+      totalPrice, 
       paymentMethod,
       paymentStatus,
       razorpay_order_id,
-      razorpay_payment_id, } = req.body;
+      razorpay_payment_id,
+      address
+    } = req.body;
 
     const order = new OrderModel({
       user_id,
@@ -76,12 +82,38 @@ app.post("/place-order", async (req, res) => {
 
     await order.save();
 
-    console.log("Saved order:", order);
+    const itemList = items.map(item =>
+      `${item.productName} (Qty: ${item.quantity}) - ₹${item.price}`
+    ).join("\n");
 
-    res.json({ message: "Order placed successfully" });
+    const msg = {
+      to: email,
+      from: "acharyasahana081@gmail.com",
+      subject: "Order Confirmation",
+      text: `
+Your order has been placed successfully!
+
+Order Details:
+${itemList}
+
+Total: ₹${totalPrice}
+
+Delivery Address:
+${address?.name}
+${address?.phone}
+${address?.address}
+${address?.city}, ${address?.district}, ${address?.state} - ${address?.pincode}
+
+Thank you for shopping!
+      `,
+    };
+
+    await sgMail.send(msg);
+
+    res.json({ message: "Order placed & email sent" });
 
   } catch (err) {
-    console.error(err);
+    console.error("Order Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -134,6 +166,10 @@ app.use(cors({
     }
   },credentials:true
 }));
+
+
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
