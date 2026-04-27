@@ -188,7 +188,7 @@ app.post("/place-order", async (req, res) => {
   try {
     console.log("Incoming:", req.body);
 
-    const { email, items, total } = req.body;
+    const { email, items, totalPrice } = req.body;
 
     if (!email || !items || !totalPrice) {
       return res.status(400).json({ error: "Missing required fields" });
