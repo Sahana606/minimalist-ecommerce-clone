@@ -108,7 +108,12 @@ Thank you for shopping!
       `,
     };
 
-    await sgMail.send(msg);
+    try {
+  await sgMail.send(msg);
+  console.log("Email sent successfully");
+} catch (error) {
+  console.error(" SendGrid Error:", error.response?.body || error.message);
+}
 
     res.json({ message: "Order placed & email sent" });
 
