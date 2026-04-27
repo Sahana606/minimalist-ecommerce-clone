@@ -261,7 +261,7 @@ app.post("/create-razorpay-order", async (req, res) => {
 });
 
 /* ✅ DB */
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.ADMIN_DB_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch(console.log);
 
