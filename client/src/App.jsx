@@ -11,7 +11,8 @@ import Login from "./component/Login";
 import Otppage from "./component/Otppage";
 import Search from "./component/Search";
 import Profile from "./component/Profile";
-import ProductDetails from "./component/ProductDetails";
+import Address from "./component/Address";
+
 import AdminLogin from "./admin/component/AdminLogin";
 import AdminDashboard from "./admin/component/AdminDashboard";
 import ManageOrders from "./admin/component/ManageOrders";
@@ -21,10 +22,29 @@ import AddProduct from "./admin/component/AddProduct";
 import EditProduct from "./admin/component/EditProduct";
 import CartSidebar from "./component/CartSidebar";
 import Payment from "./component/Payment";
+import ProductDetails from "./component/ProductDetails";
+
 
 function App() {
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  const addToCart = (product) => {
+  setCart((prev) => {
+    const exist = prev.find((item) => item.id === product.id);
+
+    if (exist) {
+      return prev.map((item) =>
+        item.id === product.id
+          ? { ...item, qty: (item.qty || 1) + 1 }
+          : item
+      );
+    }
+
+    return [...prev, { ...product, qty: 1 }];
+  });
+
+  setShowCart(true); 
+};
 const isLoggedIn = localStorage.getItem("email");
   return (
     <BrowserRouter>
@@ -47,20 +67,31 @@ const isLoggedIn = localStorage.getItem("email");
   path="/profile"
   element={isLoggedIn ? <Profile /> : <Login />}
 />
- <Route path="/payment" element={<Payment />} />
+       
+    <Route
+  path="/payment"
+  element={
+    <Payment 
+      cart={cart} 
+      setCart={setCart} 
+      setShowCart={setShowCart} 
+    />
+  }
+/>
         <Route path="/shop" element={<Shop />} />
         <Route path="/best" element={<Best />} />
         <Route path="/care" element={<Care />} />
         <Route path="/ai" element={<Ai />} />
         <Route path="/track" element={<Track />} />
         <Route path="/star" element={<Star />} />
+        <Route path="/address" element={<Address />} />
 
         <Route path="/search/:keyword" element={<Search />} />
 
-        <Route
-          path="/product/:id"
-          element={<ProductDetails setCart={setCart} />}
-        />
+     <Route
+  path="/product/:id"
+  element={<ProductDetails addToCart={addToCart} />}
+/>
 
         
         <Route path="/admin/login" element={<AdminLogin />} />
