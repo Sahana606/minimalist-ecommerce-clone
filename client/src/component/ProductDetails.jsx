@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import "../style.css";
 
 function ProductDetails({ addToCart }) {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
@@ -24,27 +25,49 @@ function ProductDetails({ addToCart }) {
   if (!product) return <h2>Loading...</h2>;
 
   return (
-    <div>
-      <img
-        src={`https://minimalist-ecommerce-clone.onrender.com/uploads/${product.image}`}
-        width="400"
-        alt=""
-      />
+    <div className="product-page">
 
-      <h1>{product.name}</h1>
-      <h2>{"₹" + product.price}</h2>
-      <p>{product.description}</p>
+      {/* LEFT IMAGE */}
+      <div className="product-left">
+        <img
+          src={`https://minimalist-ecommerce-clone.onrender.com/uploads/${product.image}`}
+          alt={product.name}
+        />
+      </div>
 
-      <button
-        onClick={() =>
-          addToCart({
-            ...product,
-            images: [product.image]
-          })
-        }
-      >
-        Add to Cart
-      </button>
+      {/* RIGHT DETAILS */}
+      <div className="product-right">
+        <h1>{product.name}</h1>
+
+        <p className="desc">{product.description}</p>
+
+        {/* PRICE */}
+        <div className="price-box">
+          <span className="mrp">₹399</span>
+          <span className="price">₹{product.price}</span>
+          <span className="offer">5% OFF</span>
+        </div>
+
+        {/* ADD TO CART */}
+        <button
+          className="add-btn"
+          onClick={() =>
+            addToCart({
+              id: product._id,
+              name: product.name,
+              price: product.price,
+              desc: product.description,
+              images: [
+                `https://minimalist-ecommerce-clone.onrender.com/uploads/${product.image}`
+              ],
+              qty: 1
+            })
+          }
+        >
+          ADD TO CART
+        </button>
+
+      </div>
     </div>
   );
 }
