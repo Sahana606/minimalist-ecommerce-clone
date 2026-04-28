@@ -215,8 +215,12 @@ app.put("/admin/update-product/:id", async (req, res) => {
 
 // DELETE PRODUCT
 app.delete("/delete-product/:id", async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: "Delete failed" });
+  }
 });
 
 // PLACE ORDER
