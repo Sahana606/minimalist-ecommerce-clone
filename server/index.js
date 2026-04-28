@@ -12,16 +12,7 @@ const sgMail = require("@sendgrid/mail");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
 
-const upload = multer({ storage });
 
 
 /* ✅ CORS FIRST */
