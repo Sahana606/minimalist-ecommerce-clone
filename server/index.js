@@ -269,7 +269,7 @@ app.post("/admin/add-product", parser.single("image"), async (req, res) => {
 });
 
 // UPDATE PRODUCT
-app.put("/admin/update-product/:id", upload.single("image"), async (req, res) => {
+app.put("/admin/update-product/:id", parsor.single("image"), async (req, res) => {
   try {
     const updatedData = {
       name: req.body.name,
