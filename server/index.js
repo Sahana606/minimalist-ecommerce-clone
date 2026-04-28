@@ -13,23 +13,29 @@ const sgMail = require("@sendgrid/mail");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-/* ================= CORS ================= */
+/* ✅ CORS FIRST */
 const allowedOrigins = [
   "http://localhost:5173",
   "https://minimalist-ecommerce-clone-1.onrender.com"
 ];
 
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-    else callback(new Error("CORS not allowed"));
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("CORS not allowed"));
+    }
   },
   credentials: true
 }));
 
+
+
+/* ✅ MIDDLEWARE */
 app.use(express.json());
 
-/* ================= CONFIG ================= */
+/* ✅ CONFIG */
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 cloudinary.config({
@@ -43,7 +49,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-/* ================= SCHEMAS ================= */
+/* ✅ SCHEMAS */
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   otp: String,
@@ -58,10 +64,6 @@ const orderSchema = new mongoose.Schema({
   email: String,
   items: Array,
   totalPrice: Number,
-  paymentMethod: String,
-  paymentStatus: String,
-  razorpay_order_id: String,
-  razorpay_payment_id: String,
   status: { type: String, default: "pending" },
   datetime: { type: Date, default: Date.now },
 });
@@ -70,7 +72,7 @@ const Product = require("./models/addproduct");
 const UserModel = mongoose.model("User", userSchema);
 const OrderModel = mongoose.model("Order", orderSchema);
 
-/* ================= CLOUDINARY UPLOAD ================= */
+/* ✅ FILE UPLOAD */
 const parser = multer({
   storage: new CloudinaryStorage({
     cloudinary,
@@ -86,7 +88,7 @@ const parser = multer({
   }),
 });
 
-/* ================= HELPERS ================= */
+/* ✅ HELPER */
 function generateOTP() {
   return otpGenerator.generate(4, {
     upperCaseAlphabets: false,
@@ -103,15 +105,16 @@ async function sendMail(to, subject, html) {
       pass: process.env.EMAIL_PASS,
     },
   });
-
   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, html });
 }
 
-/* ================= AUTH ================= */
+/* ================= ROUTES ================= */
+
+// LOGIN
 app.post("/login", async (req, res) => {
   const { email } = req.body;
-
   let user = await UserModel.findOne({ email });
+
   const otp = generateOTP();
   const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
@@ -126,6 +129,40 @@ app.post("/login", async (req, res) => {
   res.json({ message: "OTP sent" });
 });
 
+app.get("/user/:email", async (req, res) => {
+  try {
+    const user = await UserModel.findOne({
+      email: req.params.email.trim().toLowerCase()
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
+
+  } catch (err) {
+    console.error("GET USER ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+app.put("/user/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { email },
+      req.body,
+      { new: true, upsert: true }
+    );
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ error: "Update failed" });
+  }
+});
+
+// VERIFY OTP
 app.post("/verify-otp", async (req, res) => {
   const { email, otp } = req.body;
   const user = await UserModel.findOne({ email });
@@ -137,28 +174,30 @@ app.post("/verify-otp", async (req, res) => {
   res.json({ email: user.email, user_id: user._id });
 });
 
-/* ================= USER ================= */
-app.get("/user/:email", async (req, res) => {
-  const user = await UserModel.findOne({
-    email: req.params.email.trim().toLowerCase()
-  });
-  res.json(user);
+// RESEND OTP
+app.post("/resend-otp", async (req, res) => {
+  const { email } = req.body;
+  const user = await UserModel.findOne({ email });
+
+  const otp = generateOTP();
+  user.otp = otp;
+  user.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+  await user.save();
+
+  await sendMail(email, "Resend OTP", `<h3>${otp}</h3>`);
+  res.json({ message: "OTP resent" });
 });
 
-app.put("/user/:email", async (req, res) => {
-  const updated = await UserModel.findOneAndUpdate(
-    { email: req.params.email },
-    req.body,
-    { new: true }
-  );
-  res.json(updated);
-});
-
-/* ================= PRODUCTS ================= */
+// PRODUCTS
 app.get("/products", async (req, res) => {
   res.json(await Product.find());
 });
 
+app.get("/products/:id", async (req, res) => {
+  res.json(await Product.findById(req.params.id));
+});
+
+// ADD PRODUCT
 app.post("/admin/add-product", parser.single("image"), async (req, res) => {
   const product = new Product({
     ...req.body,
@@ -168,51 +207,28 @@ app.post("/admin/add-product", parser.single("image"), async (req, res) => {
   res.json({ message: "Product added" });
 });
 
-app.put("/admin/update-product/:id", parser.single("image"), async (req, res) => {
-  const product = await Product.findById(req.params.id);
-
-  let imageUrl = product.image;
-
-  if (req.file) {
-    // delete old image
-    if (product.image) {
-      const publicId = product.image.split("/").pop().split(".")[0];
-      await cloudinary.uploader.destroy("products/" + publicId);
-    }
-    imageUrl = req.file.path;
-  }
-
-  const updated = await Product.findByIdAndUpdate(
-    req.params.id,
-    { ...req.body, image: imageUrl },
-    { new: true }
-  );
-
+// UPDATE PRODUCT
+app.put("/admin/update-product/:id", async (req, res) => {
+  const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(updated);
 });
 
+// DELETE PRODUCT
 app.delete("/delete-product/:id", async (req, res) => {
-  const product = await Product.findById(req.params.id);
-
-  if (product?.image) {
-    const publicId = product.image.split("/").pop().split(".")[0];
-    await cloudinary.uploader.destroy("products/" + publicId);
-  }
-
   await Product.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });
 });
 
-/* ================= ORDERS ================= */
+// PLACE ORDER
 app.post("/place-order", async (req, res) => {
   try {
-    const {
-      email,
-      items,
-      totalPrice,
-      address,
-      paymentMethod
-    } = req.body;
+    console.log("Incoming:", req.body);
+
+    const { email, items, totalPrice } = req.body;
+
+    if (!email || !items || !totalPrice) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
 
     const order = new OrderModel({
       ...req.body,
@@ -220,49 +236,57 @@ app.post("/place-order", async (req, res) => {
     });
 
     await order.save();
+    console.log("Order saved");
 
-    const itemList = items.map(i =>
-      `${i.productName} x${i.quantity} - ₹${i.price}`
-    ).join("\n");
+    // ✅ Email (safe)
+    try {
+      await sgMail.send({
+        to: email,
+        from: process.env.SENDGRID_VERIFIED_EMAIL,
+        subject: "Order Confirmation",
+        text: `Order placed successfully. Total ₹${totalPrice}`,
+      });
+      console.log("Email sent");
+    } catch (err) {
+      console.error("Email failed:", err.message);
+    }
 
-    // ✅ SENDGRID FULL EMAIL
-    await sgMail.send({
-      to: email,
-      from: process.env.SENDGRID_VERIFIED_EMAIL,
-      subject: "Order Confirmation",
-      text: `
-Order Placed Successfully
-
-Items:
-${itemList}
-
-Total: ₹${totalPrice}
-
-Address:
-${address?.name}
-${address?.phone}
-${address?.address}
-${address?.city}, ${address?.state} - ${address?.pincode}
-      `
-    });
-
-    res.json({ message: "Order placed & email sent" });
+    res.json({ message: "Order placed successfully" });
 
   } catch (err) {
-    console.error(err);
+    console.error("PLACE ORDER ERROR:", err);
     res.status(500).json({ error: err.message });
   }
 });
 
+// USER ORDERS
 app.get("/user-orders/:email", async (req, res) => {
-  res.json(await OrderModel.find({ email: req.params.email }));
+  const orders = await OrderModel.find({ email: req.params.email });
+  res.json(orders);
 });
 
+// ADMIN ORDERS
 app.get("/admin/orders", async (req, res) => {
   res.json(await OrderModel.find());
 });
 
-/* ================= PAYMENT ================= */
+// UPDATE ORDER
+app.put("/admin/update-order/:id", async (req, res) => {
+  const order = await OrderModel.findByIdAndUpdate(
+    req.params.id,
+    { status: req.body.status },
+    { new: true }
+  );
+  res.json(order);
+});
+
+// DELETE ORDER
+app.delete("/admin/delete-order/:id", async (req, res) => {
+  await OrderModel.findByIdAndDelete(req.params.id);
+  res.json({ message: "Deleted" });
+});
+
+// RAZORPAY
 app.post("/create-razorpay-order", async (req, res) => {
   const order = await razorpay.orders.create({
     amount: req.body.amount * 100,
@@ -272,10 +296,21 @@ app.post("/create-razorpay-order", async (req, res) => {
   res.json(order);
 });
 
-/* ================= DB ================= */
+/* ✅ DB */
 mongoose.connect(process.env.ADMIN_DB_URI)
   .then(() => {
     console.log("MongoDB Connected");
-    app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+
   })
-  .catch(err => console.log(err));
+  .catch(err => {
+    console.error("MongoDB ERROR:", err);
+  });
+
+/* ✅ SERVER */
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
