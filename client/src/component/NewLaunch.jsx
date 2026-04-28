@@ -4,14 +4,15 @@ import { useNavigate } from "react-router-dom";
 
 function NewLaunch({ addToCart }) {
 
-  const [addproducts, setproducts] = useState([]);
+  const [addproducts, setproducts] = useState("");
 const navigate = useNavigate();
   useEffect(() => {
     const getProducts = async () => {
       try {
 
-        const res = await axios.get("https://minimalist-ecommerce-clone.onrender.com/products");
-setproducts(res.data);
+        const data = await axios.get(
+          "https://minimalist-ecommerce-clone.onrender.com/products"
+        );
 
         setproducts(data);
 
