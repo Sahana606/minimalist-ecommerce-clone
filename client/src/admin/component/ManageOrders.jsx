@@ -20,7 +20,7 @@ function ManageOrder() {
 
   const deleteOrder = async (orderId) => {
     try {
-      await axios.delete(`https://minimalist-ecommerce-clone.onrender.com/delete-order/${orderId}`);
+      await axios.delete(`https://minimalist-ecommerce-clone.onrender.com/admin/delete-order/${orderId}`);
       setOrders(prev => prev.filter(o => o._id !== orderId));
     } catch (err) {
       console.error("Error deleting order:", err);
