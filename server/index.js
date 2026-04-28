@@ -54,6 +54,9 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   otp: String,
   otpExpires: Date,
+  firstName: String,
+  lastName: String,
+  phone: String,
 });
 
 const orderSchema = new mongoose.Schema({
@@ -124,6 +127,24 @@ app.post("/login", async (req, res) => {
 
   await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
   res.json({ message: "OTP sent" });
+});
+
+app.get("/user/:email", async (req, res) => {
+  try {
+    const user = await UserModel.findOne({
+      email: req.params.email.trim().toLowerCase()
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json(user);
+
+  } catch (err) {
+    console.error("GET USER ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
 
 // VERIFY OTP
