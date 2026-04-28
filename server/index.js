@@ -146,6 +146,21 @@ app.get("/user/:email", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+app.put("/user/:email", async (req, res) => {
+  try {
+    const { email } = req.params;
+
+    const updatedUser = await UserModel.findOneAndUpdate(
+      { email },
+      req.body,
+      { new: true, upsert: true }
+    );
+
+    res.json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ error: "Update failed" });
+  }
+});
 
 // VERIFY OTP
 app.post("/verify-otp", async (req, res) => {
