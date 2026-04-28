@@ -112,21 +112,31 @@ async function sendMail(to, subject, html) {
 
 // LOGIN
 app.post("/login", async (req, res) => {
-  const { email } = req.body;
-  let user = await UserModel.findOne({ email });
+  try {
+    const { email } = req.body;
+    let user = await UserModel.findOne({ email });
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
-  const otp = generateOTP();
-  const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+    if (!user) {
+      user = await UserModel.create({ email, otp, otpExpires });
+    } else {
+      user.otp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
+    }
 
-  if (!user) user = await UserModel.create({ email, otp, otpExpires });
-  else {
-    user.otp = otp;
-    user.otpExpires = otpExpires;
-    await user.save();
+    try {
+      await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
+    } catch {
+      console.log("OTP (email sending failed):", otp);
+    }
+
+    res.json({ message: "OTP sent" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
-
-  await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
-  res.json({ message: "OTP sent" });
 });
 
 app.get("/user/:email", async (req, res) => {
@@ -164,61 +174,154 @@ app.put("/user/:email", async (req, res) => {
 
 // VERIFY OTP
 app.post("/verify-otp", async (req, res) => {
-  const { email, otp } = req.body;
-  const user = await UserModel.findOne({ email });
+  try {
+    const { email, otp } = req.body;
 
-  if (!user || user.otp !== otp || user.otpExpires < new Date()) {
-    return res.status(400).json({ error: "Invalid OTP" });
+    let user = await UserModel.findOne({ email });
+
+    if (!user || user.otp !== otp || user.otpExpires < new Date()) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    
+    if (!user.firstName) {
+      user.firstName = "";
+      user.lastName = "";
+      user.phone = "";
+      await user.save();
+    }
+
+    res.json({ email: user.email, user_id: user._id });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
   }
-
-  res.json({ email: user.email, user_id: user._id });
 });
+
 
 // RESEND OTP
 app.post("/resend-otp", async (req, res) => {
-  const { email } = req.body;
-  const user = await UserModel.findOne({ email });
+  try {
+    const { email } = req.body;
+    const user = await UserModel.findOne({ email });
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-  const otp = generateOTP();
-  user.otp = otp;
-  user.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-  await user.save();
+    const otp = generateOTP();
+    user.otp = otp;
+    user.otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+    await user.save();
 
-  await sendMail(email, "Resend OTP", `<h3>${otp}</h3>`);
-  res.json({ message: "OTP resent" });
+    try {
+      await sendMail(email, "Resend OTP", `<h3>${otp}</h3>`);
+    } catch {
+      console.log("OTP (email sending failed):", otp);
+    }
+
+    res.json({ message: "OTP resent" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
+
 
 // PRODUCTS
 app.get("/products", async (req, res) => {
-  res.json(await Product.find());
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch {
+    res.status(500).json({ error: "Error fetching products" });
+  }
 });
 
 app.get("/products/:id", async (req, res) => {
-  res.json(await Product.findById(req.params.id));
+  try {
+    const products = await Product.findById(req.params.id);
+    if (!products) return res.status(404).json({ error: "Not found" });
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // ADD PRODUCT
 app.post("/admin/add-product", parser.single("image"), async (req, res) => {
-  const product = new Product({
-    ...req.body,
-    image: req.file?.path || "",
-  });
-  await product.save();
-  res.json({ message: "Product added" });
+  try {
+    const product = new Product({
+      name: req.body.name,
+      category: req.body.category,
+      quantity: req.body.quantity,
+      price: req.body.price,
+      section: req.body.section,
+      description: req.body.description,
+      image: req.file ? req.file.path : "",
+    });
+
+    await product.save();
+
+    res.json({ message: "Product added successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Server Error" });
+  }
 });
 
 // UPDATE PRODUCT
-app.put("/admin/update-product/:id", async (req, res) => {
-  const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  res.json(updated);
+app.put("/admin/update-product/:id", upload.single("image"), async (req, res) => {
+  try {
+    const updatedData = {
+      name: req.body.name,
+      category: req.body.category,
+      quantity: req.body.quantity,
+      price: req.body.price,
+      section: req.body.section,
+      description: req.body.description,
+    };
+
+    
+    if (req.file) {
+      updatedData.image = req.file.filename;
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    res.json({ message: "Product updated", updatedProduct });
+
+  } catch (err) {
+    res.status(500).json({ error: "Update failed" });
+  }
 });
+
 
 // DELETE PRODUCT
 app.delete("/delete-product/:id", async (req, res) => {
-  await Product.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    await Product.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted successfully" });
+  } catch {
+    res.status(500).json({ error: "Delete failed" });
+  }
 });
 
+app.get("/admin/manage-users", async (req, res) => {
+  try {
+    const users = await UserModel.find().sort({ createdAt: -1 }); 
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error fetching users" });
+  }
+});
 // PLACE ORDER
 app.post("/place-order", async (req, res) => {
   try {
@@ -267,23 +370,42 @@ app.get("/user-orders/:email", async (req, res) => {
 
 // ADMIN ORDERS
 app.get("/admin/orders", async (req, res) => {
-  res.json(await OrderModel.find());
+  try {
+    const orders = await OrderModel.find().sort({ datetime: -1 });
+    const products = await Product.find();
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error fetching orders" });
+  }
 });
 
 // UPDATE ORDER
 app.put("/admin/update-order/:id", async (req, res) => {
-  const order = await OrderModel.findByIdAndUpdate(
-    req.params.id,
-    { status: req.body.status },
-    { new: true }
-  );
-  res.json(order);
+  try {
+    const order = await OrderModel.findByIdAndUpdate(
+      req.params.id,
+      { status: req.body.status },
+      { new: true }
+    );
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    res.json({ message: "Order updated", order });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Update error" });
+  }
 });
 
 // DELETE ORDER
 app.delete("/admin/delete-order/:id", async (req, res) => {
-  await OrderModel.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    const order = await OrderModel.findByIdAndDelete(req.params.id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    res.json({ message: "Order deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Delete error" });
+  }
 });
 
 // RAZORPAY
@@ -294,6 +416,18 @@ app.post("/create-razorpay-order", async (req, res) => {
     receipt: "order_" + Date.now(),
   });
   res.json(order);
+});
+
+
+app.get("/order/:id", async (req, res) => {
+  try {
+    const order = await OrderModel.findById(req.params.id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    res.json(order);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Invalid ID" });
+  }
 });
 
 /* ✅ DB */
