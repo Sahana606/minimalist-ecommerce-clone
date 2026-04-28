@@ -27,28 +27,28 @@ function ProductDetails({ addToCart }) {
   return (
     <div className="product-page">
 
-      {/* LEFT IMAGE */}
+     
       <div className="product-left">
         <img
-          src={`https://minimalist-ecommerce-clone.onrender.com/uploads/${product.image}`}
+          src={product.image}
           alt={product.name}
         />
       </div>
 
-      {/* RIGHT DETAILS */}
+      
       <div className="product-right">
         <h1>{product.name}</h1>
 
         <p className="desc">{product.description}</p>
 
-        {/* PRICE */}
+    
         <div className="price-box">
           <span className="mrp">₹399</span>
           <span className="price">₹{product.price}</span>
           <span className="offer">5% OFF</span>
         </div>
 
-        {/* ADD TO CART */}
+       
         <button
           className="add-btn"
           onClick={() =>
