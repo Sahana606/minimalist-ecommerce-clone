@@ -239,7 +239,7 @@ app.delete("/delete-product/:id", async (req, res) => {
   }
 });
 
-PLACE ORDER
+
 app.post("/place-order", async (req, res) => {
   try {
     console.log("Incoming:", req.body);
