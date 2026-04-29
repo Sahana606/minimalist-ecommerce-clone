@@ -13,7 +13,7 @@ const sgMail = require("@sendgrid/mail");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-/* ✅ CORS FIRST */
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://minimalist-ecommerce-clone-1.onrender.com"
@@ -31,11 +31,8 @@ app.use(cors({
 }));
 
 
-
-/* ✅ MIDDLEWARE */
 app.use(express.json());
 
-/* ✅ CONFIG */
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 cloudinary.config({
@@ -49,7 +46,7 @@ const razorpay = new Razorpay({
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-/* ✅ SCHEMAS */
+
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   otp: String,
@@ -72,7 +69,7 @@ const Product = require("./models/addproduct");
 const UserModel = mongoose.model("User", userSchema);
 const OrderModel = mongoose.model("Order", orderSchema);
 
-/* ✅ FILE UPLOAD */
+
 const parser = multer({
   storage: new CloudinaryStorage({
     cloudinary,
@@ -88,7 +85,7 @@ const parser = multer({
   }),
 });
 
-/* ✅ HELPER */
+
 function generateOTP() {
   return otpGenerator.generate(4, {
     upperCaseAlphabets: false,
@@ -108,7 +105,7 @@ async function sendMail(to, subject, html) {
   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, html });
 }
 
-/* ================= ROUTES ================= */
+
 
 // LOGIN
 app.post("/login", async (req, res) => {
@@ -242,7 +239,7 @@ app.post("/place-order", async (req, res) => {
     await order.save();
     console.log("Order saved");
 
-    // ✅ Email (safe)
+    
     try {
       await sgMail.send({
         to: email,
@@ -300,7 +297,7 @@ app.post("/create-razorpay-order", async (req, res) => {
   res.json(order);
 });
 
-/* ✅ DB */
+
 mongoose.connect(process.env.ADMIN_DB_URI)
   .then(() => {
     console.log("MongoDB Connected");
@@ -314,5 +311,5 @@ mongoose.connect(process.env.ADMIN_DB_URI)
     console.error("MongoDB ERROR:", err);
   });
 
-/* ✅ SERVER */
+
 
