@@ -10,7 +10,7 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const lastEmail = localStorage.setItem("otpEmail", email);
+    const lastEmail = localStorage.setItem("otpEmail");
     if (lastEmail) {
       setEmail(lastEmail);
     }
