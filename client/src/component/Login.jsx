@@ -27,23 +27,22 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!validateEmail(email)) return;
+  if (!validateEmail(email)) return;
 
-    try {
-      await axios.post(
-        "https://minimalist-ecommerce-clone.onrender.com/login",
-        { email }
-      );
+  try {
+    await axios.post(
+      "https://minimalist-ecommerce-clone.onrender.com/login",
+      { email }
+    );
+  } catch (err) {
+    console.log("API ERROR:", err);
+  }
 
-      localStorage.setItem("otpEmail", email);
-      navigate("/otp", { state: { email } });
-
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  localStorage.setItem("otpEmail", email);
+  navigate("/otp", { state: { email } });
+};
 
   return (
     <form onSubmit={handleSubmit}>
