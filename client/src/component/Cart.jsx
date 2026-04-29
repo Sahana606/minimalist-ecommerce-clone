@@ -87,9 +87,7 @@ function Cart() {
 
               <img
                 src={
-                  item.images
-                    ? item.images[0]
-                    : `https://minimalist-ecommerce-clone.onrender.com/uploads/${item.image}`
+                  item.image
                 }
                 alt={item.name}
               />
