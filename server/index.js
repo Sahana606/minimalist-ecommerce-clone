@@ -143,6 +143,15 @@ app.get("/user/:email", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+app.get("/users", async (req, res) => {
+  try {
+    const users = await UserModel.find();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 app.put("/user/:email", async (req, res) => {
   try {
     const { email } = req.params;
