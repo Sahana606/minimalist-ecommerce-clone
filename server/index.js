@@ -144,6 +144,16 @@ app.get("/user/:email", async (req, res) => {
   }
 });
 
+app.get("/admin/manage-users", async (req, res) => {
+  try {
+    const users = await UserModel.find().sort({ createdAt: -1 }); 
+    res.json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error fetching users" });
+  }
+});
+
 app.get("/users", async (req, res) => {
   try {
     const users = await UserModel.find();
