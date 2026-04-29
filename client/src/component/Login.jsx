@@ -26,23 +26,19 @@ function Login() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!validateEmail(email)) return;
+  if (!validateEmail(email)) return;
 
-    try {
-      await axios.post("https://minimalist-ecommerce-clone.onrender.com/login", { email });
+  localStorage.setItem("otpEmail", email);
+  navigate("/otp", { state: { email } });
 
-      
-      localStorage.setItem("otpEmail", email);
-
-      navigate("/otp", { state: { email } });
-
-    } catch (err) {
-      console.log("Error:", err.response?.data);
-    }
-  };
+  axios.post(
+    "https://minimalist-ecommerce-clone.onrender.com/login",
+    { email }
+  ).catch(err => console.log(err));
+};
 
   return (
     <form onSubmit={handleSubmit}>
