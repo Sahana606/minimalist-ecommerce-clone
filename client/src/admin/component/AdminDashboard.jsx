@@ -31,7 +31,7 @@ function AdminDashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const ordersRes = await axios.get(`${BASE_URL}/orders`);
+        const ordersRes = await axios.get(`${BASE_URL}/admin/orders`);
         const productsRes = await axios.get(`${BASE_URL}/products`);
         const usersRes = await axios.get(`${BASE_URL}/users`);
 
