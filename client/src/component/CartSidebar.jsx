@@ -83,13 +83,7 @@ function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
           cart.map(item => (
             <div className="cart-item" key={item.id}>
               <span className="remove-btn" onClick={() => removeItem(item.id)}>X</span>
-             <img
-  src={
-    item.image
-  }
-  width="60"
-  alt={item.name}
-/>
+             <img src={ item.image  } width="60"alt={item.name}/>
               <div>
                 <h4>{item.name}</h4>
                 <p>{item.desc}</p>
