@@ -31,17 +31,18 @@ function Login() {
 
   if (!validateEmail(email)) return;
 
+  localStorage.setItem("otpEmail", email);
+
+  navigate("/otp", { state: { email } });
+
   try {
     await axios.post(
       "https://minimalist-ecommerce-clone.onrender.com/login",
       { email }
     );
   } catch (err) {
-    console.log("API ERROR:", err);
+    console.log(err);
   }
-
-  localStorage.setItem("otpEmail", email);
-  navigate("/otp", { state: { email } });
 };
 
   return (
