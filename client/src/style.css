@@ -342,72 +342,59 @@ body{
   color: #fff;
 }
 
-.adminlogin .container1{
-  margin-top:150px;
-  justify-items: center;
-
+.adminlogin {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
+.adminlogin .container1 {
+  border-radius: 10px;
+  background-color: #fafafa;
+  padding: 25px;
+  box-shadow: 0 9px 25px rgba(0, 0, 0, 0.09);
+  width: 390px;
+  min-height: 250px;
+  text-align: center;
+}
 
-.adminlogin .card0{
-  border: none;
-  outline: none;
+.adminlogin .card0 {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.adminlogin input {
+  width: 100%;
   padding: 10px;
-  font-size: 16px;
-  width: 340px;
-  font-family: sans-serif;
-  background: transparent;
-   border-radius: 9px;
-   height:42px;
-   margin-left: 100px;
-   margin-top: 20px;
-   
-
+  margin-top: 10px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
 }
 
-.adminlogin .card0 #password{
+.adminlogin #password {
   margin-top: 10px;
 }
 
-.adminlogin .container1{
-  border-radius:10px;
-  background-color: #fafafa;
-  padding: 16px 20px;
-  justify-items: center;
-  margin-top:100px;
-  margin-left: 480px;
-  margin-right:480px;
-  box-shadow: 0 9px 25px rgba(0, 0, 0, 0.09);
-  width:390px;
-  min-height: 250px;
- 
-}
-
-
-.addproduct .add{
-   border-radius:10px;
-  background-color: #fafafa;
-  padding: 16px 20px;
-  justify-items: center;
-  margin-top:100px;
-  margin-left: 480px;
-  margin-right:480px;
-  box-shadow: 0 9px 25px rgba(0, 0, 0, 0.09);
-  width:390px;
-  min-height: 250px;
-}
-
-
-
-.adminlogin .button{
-  justify-items: center;
-  height: 30pt;
-   border-radius:10px;
+.adminlogin .button {
+  margin-top: 20px;
+  height: 40px;
+  border-radius: 10px;
   background-color: black;
   color: #fff;
-  min-width: 200px;
-  
+  width: 100%;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s;
 }
+
+.adminlogin .button:hover {
+  background-color: #333;
+}
+
 
 .addproduct .container1{
   border-radius:10px;
@@ -1577,6 +1564,3 @@ textarea {
 .save-btn:hover {
   background: #333;
 }
-
-
-
