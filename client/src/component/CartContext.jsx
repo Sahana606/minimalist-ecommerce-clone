@@ -46,6 +46,7 @@ export function CartProvider({ children }) {
           ...product,
           id: productId, 
           qty: 1,
+          image: product.image || product.images?.[0] || ""
         },
       ];
     });
