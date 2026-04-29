@@ -42,7 +42,9 @@ function Otppage() {
       localStorage.setItem("email", res.data.email);
       localStorage.setItem("user_id", res.data.user_id || "");
       localStorage.removeItem("otpEmail");
-      navigate("/");
+      console.log("Going to profile...");
+navigate("/profile");
+     
 
     } catch (err) {
       setError(err.response?.data?.error || "Invalid OTP");
