@@ -102,7 +102,7 @@ function AdminDashboard() {
         {/* SIDEBAR */}
         <div className="sidebar">
           <Link to="/admin/add-product">Add Product</Link>
-          <Link to="/admin/manage-product">Manage Product</Link>
+         <Link to="/admin/manage-products">Manage Product</Link>
           <Link to="/admin/manage-orders">Manage Orders</Link>
           <Link to="/admin/manage-users">Manage Users</Link>
         </div>
@@ -123,7 +123,7 @@ function AdminDashboard() {
         ) : location.pathname === "/admin/add-product" ? (
           <AddProduct />
 
-        ) : location.pathname === "/admin/manage-product" ? (
+        ) : location.pathname === "/admin/manage-products" ? (
           <ManageProduct />
 
         ) : location.pathname === "/admin/manage-orders" ? (
