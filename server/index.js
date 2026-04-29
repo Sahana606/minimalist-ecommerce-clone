@@ -259,6 +259,14 @@ app.post("/place-order", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+app.get("/users", async (req, res) => {
+  try {
+    const users = await UserModel.find();
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 // USER ORDERS
 app.get("/user-orders/:email", async (req, res) => {
