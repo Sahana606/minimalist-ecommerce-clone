@@ -10,11 +10,11 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const lastEmail = localStorage.setItem("otpEmail");
-    if (lastEmail) {
-      setEmail(lastEmail);
-    }
-  }, []);
+  const lastEmail = localStorage.getItem("otpEmail");
+  if (lastEmail) {
+    setEmail(lastEmail);
+  }
+}, []);
 
   const validateEmail = (value) => {
     if (!validator.isEmail(value)) {
@@ -35,7 +35,7 @@ function Login() {
       await axios.post("https://minimalist-ecommerce-clone.onrender.com/login", { email });
 
       
-      localStorage.setItem("otpEmail", email);
+      localStorage.setItem("otpEmail");
 
       navigate("/otp", { state: { email } });
 
