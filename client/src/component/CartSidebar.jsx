@@ -85,11 +85,7 @@ function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
               <span className="remove-btn" onClick={() => removeItem(item.id)}>X</span>
              <img
   src={
-    item.images?.[0]
-      ? item.images[0].startsWith("http")
-        ? item.images[0]
-        : `https://minimalist-ecommerce-clone.onrender.com/uploads/${item.images[0]}`
-      : "https://via.placeholder.com/60"
+    item.image
   }
   width="60"
   alt={item.name}
