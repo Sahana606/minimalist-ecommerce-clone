@@ -240,40 +240,7 @@ app.delete("/delete-product/:id", async (req, res) => {
 });
 
 // PLACE ORDER
-app.post("/place-order", async (req, res) => {
-  try {
-    console.log("Incoming:", req.body);
-
-    const { email, items, totalPrice } = req.body;
-
-    if (!email || !items || !totalPrice) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
-
-    const order = new OrderModel({
-      ...req.body,
-      email: email.toLowerCase(),
-    });
-
-    await order.save();
-    console.log("Order saved");
-
-    
-  try { await sgMail.send({ 
-    to: email, 
-    from: process.env.SENDGRID_VERIFIED_EMAIL, 
-    subject: "Order Confirmation",
-    text: Order placed successfully. Total ₹${totalPrice}, }); 
-       console.log("Email sent");
-      } catch (err) { console.error("Email failed:", err.message); }
-
-    res.json({ message: "Order placed successfully" });
-
-  } catch (err) {
-    console.error("PLACE ORDER ERROR:", err);
-    res.status(500).json({ error: err.message });
-  }
-});
+app.post("/place-order", async (req, res) => { try { console.log("Incoming:", req.body); const { email, items, totalPrice } = req.body; if (!email || !items || !totalPrice) { return res.status(400).json({ error: "Missing required fields" }); } const order = new OrderModel({ ...req.body, email: email.toLowerCase(), }); await order.save(); console.log("Order saved"); try { await sgMail.send({ to: email, from: process.env.SENDGRID_VERIFIED_EMAIL, subject: "Order Confirmation", text: Order placed successfully. Total ₹${totalPrice}, }); console.log("Email sent"); } catch (err) { console.error("Email failed:", err.message); } res.json({ message: "Order placed successfully" }); } catch (err) { console.error("PLACE ORDER ERROR:", err); res.status(500).json({ error: err.message }); } });
 
 
 // USER ORDERS
