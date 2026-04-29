@@ -59,14 +59,14 @@ function Payment({ cart, setCart, setShowCart }) {
         }
       );
 
-      alert("Order placed successfully ✅");
+      alert("Order placed successfully ");
 
       setCart([]);
       setShowCart(false);
       navigate("/");
     } catch (err) {
       console.error(err.response?.data || err.message);
-      alert("Server error while placing order ❌");
+      alert("Server error while placing order ");
     }
   };
 
@@ -99,7 +99,7 @@ function Payment({ cart, setCart, setShowCart }) {
       rzp.open();
     } catch (err) {
       console.error(err);
-      alert("Payment failed ❌");
+      alert("Payment failed ");
     }
   };
 
