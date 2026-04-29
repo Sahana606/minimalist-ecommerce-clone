@@ -7,7 +7,6 @@ function Otppage() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // ✅ Get email safely
   const email =
     location.state?.email || localStorage.getItem("otpEmail");
 
@@ -15,7 +14,6 @@ function Otppage() {
   const [error, setError] = useState("");
   const [counter, setCounter] = useState(0);
 
-  // ✅ Redirect if no email
   useEffect(() => {
     if (!email) {
       navigate("/");
@@ -36,24 +34,18 @@ function Otppage() {
         { email, otp: finalOtp }
       );
 
-      console.log("Verified:", res.data);
-
-      // ✅ Save user info
       localStorage.setItem("email", res.data.email);
       localStorage.setItem("user_id", res.data.user_id || "");
-
       localStorage.removeItem("otpEmail");
 
       navigate("/profile");
 
     } catch (err) {
       setError(err.response?.data?.error || "Invalid OTP");
-
       setTimeout(() => setError(""), 2000);
     }
   };
 
-  // ✅ Timer
   useEffect(() => {
     let timer;
     if (counter > 0) {
@@ -62,7 +54,6 @@ function Otppage() {
     return () => clearTimeout(timer);
   }, [counter]);
 
-  // ✅ FIXED: same backend URL
   const handleResend = async () => {
     try {
       await axios.post(
