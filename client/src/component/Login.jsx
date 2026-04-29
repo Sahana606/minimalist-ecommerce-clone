@@ -9,7 +9,6 @@ function Login() {
   const [emailError, setEmailError] = useState("");
   const navigate = useNavigate();
 
-  // ✅ FIXED: getItem instead of setItem
   useEffect(() => {
     const lastEmail = localStorage.getItem("otpEmail");
     if (lastEmail) {
@@ -33,22 +32,16 @@ function Login() {
     if (!validateEmail(email)) return;
 
     try {
-      const res = await axios.post(
+      await axios.post(
         "https://minimalist-ecommerce-clone.onrender.com/login",
         { email }
       );
 
-      console.log("OTP sent:", res.data);
-
-      // ✅ Save email
       localStorage.setItem("otpEmail", email);
-
-      // ✅ Navigate to OTP page
       navigate("/otp", { state: { email } });
 
     } catch (err) {
-      console.log("Error:", err);
-      alert("Failed to send OTP");
+      console.log(err);
     }
   };
 
