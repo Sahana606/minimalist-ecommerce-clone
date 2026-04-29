@@ -10,7 +10,7 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const lastEmail = localStorage.getItem("otpEmail");
+    const lastEmail = localStorage.getItem("lastLoginEmail");
     if (lastEmail) {
       setEmail(lastEmail);
     }
@@ -27,41 +27,41 @@ function Login() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!validateEmail(email)) return;
+    if (!validateEmail(email)) return;
 
-  localStorage.setItem("otpEmail", email);
+    try {
+      await axios.post("https://minimalist-ecommerce-clone.onrender.com/login", { email });
 
-  navigate("/otp", { state: { email } });
+      
+      localStorage.setItem("otpEmail", email);
 
-  try {
-    await axios.post(
-      "https://minimalist-ecommerce-clone.onrender.com/login",
-      { email }
-    );
-  } catch (err) {
-    console.log(err);
-  }
-};
+      navigate("/otp", { state: { email } });
+
+    } catch (err) {
+      console.log("Error:", err.response?.data);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="container">
-        <img src="/images/LOGIN.avif" width="300" height="300" alt="Login" />
+        <img src="images/LOGIN.avif" width="300" height="300" alt="Login" />
 
         <h2>Login</h2>
         <p>Enter your Email</p>
 
-        <input
-          type="email"
-          placeholder="enter email example@gmail.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        {emailError && <p style={{ color: "red" }}>{emailError}</p>}
+        <div>
+          <input
+            type="email"
+            placeholder="enter email example@gmail.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          {emailError && <p style={{ color: "red" }}>{emailError}</p>}
+        </div>
 
         <br /><br />
 
