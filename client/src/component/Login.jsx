@@ -9,12 +9,13 @@ function Login() {
   const [emailError, setEmailError] = useState("");
   const navigate = useNavigate();
 
+  // ✅ FIXED: getItem instead of setItem
   useEffect(() => {
-  const lastEmail = localStorage.getItem("otpEmail");
-  if (lastEmail) {
-    setEmail(lastEmail);
-  }
-}, []);
+    const lastEmail = localStorage.getItem("otpEmail");
+    if (lastEmail) {
+      setEmail(lastEmail);
+    }
+  }, []);
 
   const validateEmail = (value) => {
     if (!validator.isEmail(value)) {
@@ -32,36 +33,42 @@ function Login() {
     if (!validateEmail(email)) return;
 
     try {
-      await axios.post("https://minimalist-ecommerce-clone.onrender.com/login", { email });
+      const res = await axios.post(
+        "https://minimalist-ecommerce-clone.onrender.com/login",
+        { email }
+      );
 
-      
-      localStorage.setItem("otpEmail");
+      console.log("OTP sent:", res.data);
 
+      // ✅ Save email
+      localStorage.setItem("otpEmail", email);
+
+      // ✅ Navigate to OTP page
       navigate("/otp", { state: { email } });
 
     } catch (err) {
-      console.log("Error:", err.response?.data);
+      console.log("Error:", err);
+      alert("Failed to send OTP");
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <div className="container">
-        <img src="images/LOGIN.avif" width="300" height="300" alt="Login" />
+        <img src="/images/LOGIN.avif" width="300" height="300" alt="Login" />
 
         <h2>Login</h2>
         <p>Enter your Email</p>
 
-        <div>
-          <input
-            type="email"
-            placeholder="enter email example@gmail.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          {emailError && <p style={{ color: "red" }}>{emailError}</p>}
-        </div>
+        <input
+          type="email"
+          placeholder="enter email example@gmail.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        {emailError && <p style={{ color: "red" }}>{emailError}</p>}
 
         <br /><br />
 
