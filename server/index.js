@@ -108,38 +108,67 @@ async function sendMail(to, subject, html) {
 
 
 // LOGIN
+// app.post("/login", async (req, res) => {
+//   const { email } = req.body;
+//   let user = await UserModel.findOne({ email });
+
+//   const otp = generateOTP();
+//   const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
+
+//   if (!user) user = await UserModel.create({ email, otp, otpExpires });
+//   else {
+//     user.otp = otp;
+//     user.otpExpires = otpExpires;
+//     await user.save();
+//   }
+
+//   await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
+//   res.json({ message: "OTP sent" });
+// });
+
+// app.get("/user/:email", async (req, res) => {
+//   try {
+//     const user = await UserModel.findOne({
+//       email: req.params.email.trim().toLowerCase()
+//     });
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     res.json(user);
+
+//   } catch (err) {
+//     console.error("GET USER ERROR:", err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+// });
 app.post("/login", async (req, res) => {
-  const { email } = req.body;
-  let user = await UserModel.findOne({ email });
-
-  const otp = generateOTP();
-  const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-
-  if (!user) user = await UserModel.create({ email, otp, otpExpires });
-  else {
-    user.otp = otp;
-    user.otpExpires = otpExpires;
-    await user.save();
-  }
-
-  await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
-  res.json({ message: "OTP sent" });
-});
-
-app.get("/user/:email", async (req, res) => {
   try {
-    const user = await UserModel.findOne({
-      email: req.params.email.trim().toLowerCase()
-    });
+    const { email } = req.body;
+    let user = await UserModel.findOne({ email });
+
+    const otp = generateOTP();
+    const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      user = await UserModel.create({ email, otp, otpExpires });
+    } else {
+      user.otp = otp;
+      user.otpExpires = otpExpires;
+      await user.save();
     }
 
-    res.json(user);
+ 
+    res.json({ message: "OTP sent" });
+
+    
+    sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
+
+    console.log("OTP:", otp);
 
   } catch (err) {
-    console.error("GET USER ERROR:", err);
+    console.error("LOGIN ERROR:", err);
     res.status(500).json({ error: "Server error" });
   }
 });
