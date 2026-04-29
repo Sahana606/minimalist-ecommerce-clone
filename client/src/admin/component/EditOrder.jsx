@@ -107,8 +107,6 @@
 
 
 
-
-
 function EditOrder() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -116,14 +114,17 @@ function EditOrder() {
   const [order, setOrder] = useState(null);
   const [status, setStatus] = useState("");
 
+  const BASE_URL = "https://minimalist-ecommerce-clone.onrender.com";
+
   useEffect(() => {
     const getOrder = async () => {
       try {
-        const res = await axios.get(
-          `https://minimalist-ecommerce-clone.onrender.com/user-orders/${id}`
-        );
-        setOrder(res.data);
-        setStatus(res.data.status);
+        const res = await axios.get(`${BASE_URL}/user-orders/${id}`);
+
+        const data = Array.isArray(res.data) ? res.data[0] : res.data;
+
+        setOrder(data);
+        setStatus(data?.status || "");
       } catch (err) {
         console.error(err.response?.data || err.message);
       }
@@ -135,10 +136,9 @@ function EditOrder() {
   const updateOrder = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(
-        `https://minimalist-ecommerce-clone.onrender.com/admin/update-order/${id}`,
-        { status }
-      );
+      await axios.put(`${BASE_URL}/admin/update-order/${id}`, {
+        status,
+      });
       alert("Order updated successfully");
       navigate("/admin/manage-order");
     } catch (err) {
@@ -166,17 +166,21 @@ function EditOrder() {
 
         <tbody>
           <tr>
-            <td>{order.user_id}</td>
-            <td>{order.email}</td>
-            <td>₹{order.totalPrice}</td>
-            <td>{new Date(order.datetime).toLocaleString()}</td>
+            <td>{order.user_id || "-"}</td>
+            <td>{order.email || "-"}</td>
+            <td>₹{order.totalPrice || 0}</td>
+            <td>
+              {order.datetime
+                ? new Date(order.datetime).toLocaleString()
+                : "No Date"}
+            </td>
 
             <td>
               {order.items?.length > 0 ? (
                 order.items.map((item, idx) => (
                   <div key={idx} style={{ marginBottom: "10px" }}>
                     <img
-                      src={`https://minimalist-ecommerce-clone.onrender.com/uploads/${item.image}`}
+                      src={`${BASE_URL}/uploads/${item.image}`}
                       width="50"
                     />
                     <div>
@@ -192,7 +196,7 @@ function EditOrder() {
               )}
             </td>
 
-            <td>{order.status}</td>
+            <td>{order.status || "-"}</td>
           </tr>
         </tbody>
       </table>
@@ -212,4 +216,10 @@ function EditOrder() {
     </div>
   );
 }
+
+export default EditOrder;
+
+
+
+
 export default EditOrder;
