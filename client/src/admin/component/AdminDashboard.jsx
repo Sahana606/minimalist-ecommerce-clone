@@ -103,12 +103,12 @@ function AdminDashboard() {
         <div className="sidebar">
           <Link to="/admin/add-product">Add Product</Link>
          <Link to="/admin/manage-products">Manage Product</Link>
-          <Link to="/admin/manage-orders">Manage Orders</Link>
+          <Link to="/admin/manage-order">Manage Orders</Link>
           <Link to="/admin/manage-users">Manage Users</Link>
         </div>
 
         {/* ROUTING */}
-        {location.pathname.startsWith("/admin/edit-product") ? (
+        {location.pathname.startsWith("/admin/update-product") ? (
           <EditProduct />
 
         ) : location.pathname.startsWith("/admin/edit-user") ? (
@@ -126,7 +126,7 @@ function AdminDashboard() {
         ) : location.pathname === "/admin/manage-products" ? (
           <ManageProduct />
 
-        ) : location.pathname === "/admin/manage-orders" ? (
+        ) : location.pathname === "/admin/manage-order" ? (
           <ManageOrders />
 
         ) : location.pathname === "/admin/manage-users" ? (
