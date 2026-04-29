@@ -7,6 +7,7 @@ function Otppage() {
   const location = useLocation();
   const navigate = useNavigate();
 
+ 
   const email =
     location.state?.email || localStorage.getItem("otpEmail");
 
@@ -20,6 +21,7 @@ function Otppage() {
     }
   }, [email, navigate]);
 
+  
   const handleVerify = async () => {
     const finalOtp = otp.join("");
 
@@ -34,17 +36,23 @@ function Otppage() {
         { email, otp: finalOtp }
       );
 
+      console.log("Response:", res.data);
+
+     
       localStorage.setItem("email", res.data.email);
       localStorage.setItem("user_id", res.data.user_id || "");
       localStorage.removeItem("otpEmail");
-
-      navigate("/profile");
+      navigate("/");
 
     } catch (err) {
       setError(err.response?.data?.error || "Invalid OTP");
-      setTimeout(() => setError(""), 2000);
+
+      setTimeout(() => {
+        setError("");
+      }, 2000);
     }
   };
+
 
   useEffect(() => {
     let timer;
@@ -54,13 +62,11 @@ function Otppage() {
     return () => clearTimeout(timer);
   }, [counter]);
 
+ 
   const handleResend = async () => {
     try {
-      await axios.post(
-        "https://minimalist-ecommerce-clone.onrender.com/resend-otp",
-        { email }
-      );
-      setCounter(60);
+      await axios.post("http://127.0.0.1:3001/resend-otp", { email });
+      setCounter(60); 
     } catch (err) {
       console.log(err);
     }
@@ -73,6 +79,7 @@ function Otppage() {
     newOtp[index] = value;
     setOtp(newOtp);
 
+    
     if (value && index < 3) {
       document.getElementById(`otp-${index + 1}`)?.focus();
     }
@@ -81,8 +88,7 @@ function Otppage() {
   return (
     <div className="otp">
       <div className="container">
-        <img src="/images/LOGIN.avif" width="300" height="300" alt="Login" />
-
+        <img src="images/LOGIN.avif" width="300" height="300" alt="Login" />
         <h1>Enter OTP</h1>
         <p>OTP sent on {email}</p>
 
@@ -108,7 +114,9 @@ function Otppage() {
           {counter > 0 ? (
             <span>Resend OTP in {counter}s</span>
           ) : (
-            <button onClick={handleResend}>Resend OTP</button>
+            <button onClick={handleResend}>
+              Resend OTP
+            </button>
           )}
         </div>
 
