@@ -126,23 +126,23 @@ async function sendMail(to, subject, html) {
 //   res.json({ message: "OTP sent" });
 // });
 
-// app.get("/user/:email", async (req, res) => {
-//   try {
-//     const user = await UserModel.findOne({
-//       email: req.params.email.trim().toLowerCase()
-//     });
+app.get("/user/:email", async (req, res) => {
+  try {
+    const user = await UserModel.findOne({
+      email: req.params.email.trim().toLowerCase()
+    });
 
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
 
-//     res.json(user);
+    res.json(user);
 
-//   } catch (err) {
-//     console.error("GET USER ERROR:", err);
-//     res.status(500).json({ error: "Server error" });
-//   }
-// });
+  } catch (err) {
+    console.error("GET USER ERROR:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 app.post("/login", async (req, res) => {
   try {
     const { email } = req.body;
