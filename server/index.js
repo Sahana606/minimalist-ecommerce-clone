@@ -240,40 +240,107 @@ app.delete("/delete-product/:id", async (req, res) => {
 });
 
 // PLACE ORDER
+// app.post("/place-order", async (req, res) => {
+//   try {
+//     console.log("Incoming:", req.body);
+
+//     const { email, items, totalPrice } = req.body;
+
+//     if (!email || !items || !totalPrice) {
+//       return res.status(400).json({ error: "Missing required fields" });
+//     }
+
+//     const order = new OrderModel({
+//       ...req.body,
+//       email: email.toLowerCase(),
+//     });
+
+//     await order.save();
+//     console.log("Order saved");
+
+//    try {
+//   await sgMail.send({
+//     to: email,
+//     from: process.env.SENDGRID_VERIFIED_EMAIL,
+//     subject: "Order Confirmation",
+//     text: `Order placed successfully. Total ₹${totalPrice}`,
+//   });
+//   console.log("Email sent");
+// } catch (err) {
+//   console.error("FULL EMAIL ERROR:", err.response?.body || err);
+// }
+
+//     res.json({ message: "Order placed successfully" });
+
+//   } catch (err) {
+//     console.error("PLACE ORDER ERROR:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
 app.post("/place-order", async (req, res) => {
   try {
-    console.log("Incoming:", req.body);
-
-    const { email, items, totalPrice } = req.body;
-
-    if (!email || !items || !totalPrice) {
-      return res.status(400).json({ error: "Missing required fields" });
-    }
+    const { 
+      user_id, 
+      email, 
+      items, 
+      totalPrice, 
+      paymentMethod,
+      paymentStatus,
+      razorpay_order_id,
+      razorpay_payment_id,
+      address
+    } = req.body;
 
     const order = new OrderModel({
-      ...req.body,
-      email: email.toLowerCase(),
+      user_id,
+      email: email.trim().toLowerCase(),
+      items,
+      totalPrice,
+      paymentMethod,
+      paymentStatus,
+      razorpay_order_id,
+      razorpay_payment_id,
+      address
     });
 
     await order.save();
-    console.log("Order saved");
 
-   try {
-  await sgMail.send({
-    to: email,
-    from: process.env.SENDGRID_VERIFIED_EMAIL,
-    subject: "Order Confirmation",
-    text: `Order placed successfully. Total ₹${totalPrice}`,
-  });
-  console.log("Email sent");
-} catch (err) {
-  console.error("FULL EMAIL ERROR:", err.response?.body || err);
-}
+    const itemList = items.map(item =>
+      `${item.productName} (Qty: ${item.quantity}) - ₹${item.price}`
+    ).join("\n");
 
-    res.json({ message: "Order placed successfully" });
+    const msg = {
+      to: email,
+      from: process.env.SENDGRID_VERIFIED_EMAIL, 
+      subject: "Order Confirmation",
+      text: `Your order has been placed successfully!
+
+Order Details:
+${itemList}
+
+Total: ₹${totalPrice}
+
+Delivery Address:
+${address?.name || ""}
+${address?.phone || ""}
+${address?.address || ""}
+${address?.city || ""}, ${address?.district || ""}, ${address?.state || ""} - ${address?.pincode || ""}
+
+Thank you for shopping!`
+    };
+
+    try {
+      await sgMail.send(msg);
+      console.log("Email sent successfully");
+    } catch (error) {
+      console.error("SendGrid Error:", error.response?.body || error.message);
+    }
+
+    res.json({ message: "Order placed & email sent" });
 
   } catch (err) {
-    console.error("PLACE ORDER ERROR:", err);
+    console.error("Order Error:", err);
     res.status(500).json({ error: err.message });
   }
 });
