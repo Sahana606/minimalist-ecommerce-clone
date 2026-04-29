@@ -1623,3 +1623,105 @@ textarea {
   color: black;
   font-weight: bold;
 }
+
+
+
+/* ===== MAIN DASHBOARD AREA ===== */
+.dashboard-main-content {
+  flex: 1;
+  padding: 30px;
+  background: #f4f6f8;
+}
+
+/* Page Title */
+.dashboard-main-content h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #111827;
+  font-weight: 600;
+}
+
+/* ===== STATS GRID ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stats-grid div {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: 0.3s;
+  border-left: 4px solid #00c853;
+}
+
+.stats-grid div:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+}
+
+/* ===== GRAPH SECTION ===== */
+.dashboard-main-content h3 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  color: #111827;
+}
+
+.dashboard-main-content .recharts-wrapper {
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* ===== RECENT ORDERS TABLE ===== */
+.dashboard-main-content table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  margin-top: 15px;
+}
+
+.dashboard-main-content thead {
+  background: #111827;
+  color: white;
+}
+
+.dashboard-main-content th,
+.dashboard-main-content td {
+  padding: 12px 15px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Rows */
+.dashboard-main-content tbody tr {
+  border-bottom: 1px solid #eee;
+  transition: 0.2s;
+}
+
+.dashboard-main-content tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* Status styling */
+.dashboard-main-content td:last-child {
+  font-weight: 600;
+}
+
+.dashboard-main-content td:last-child:contains("Delivered") {
+  color: #16a34a;
+}
+
+.dashboard-main-content td:last-child:contains("Pending") {
+  color: #f59e0b;
+}
