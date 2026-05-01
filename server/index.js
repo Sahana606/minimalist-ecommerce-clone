@@ -7,7 +7,7 @@ const nodemailer = require("nodemailer");
 const multer = require("multer");
 const Razorpay = require("razorpay");
 const cloudinary = require("cloudinary").v2;
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 const sgMail = require("@sendgrid/mail");
 const pdfserver = require("./pdf-server");
 const app = express();
