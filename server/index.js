@@ -159,11 +159,11 @@ app.post("/login", async (req, res) => {
       await user.save();
     }
 
-    // Send OTP via email/service
+
     sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
     console.log("OTP:", otp);
 
-    // Attempt to send order confirmation
+   
     try {
       await sgMail.send({
         to: email,
@@ -176,7 +176,7 @@ app.post("/login", async (req, res) => {
       console.error("Email failed:", err.message);
     }
 
-    // Send final success response
+   
     res.json({ message: "OTP sent and order processed successfully" });
 
   } catch (err) {
