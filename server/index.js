@@ -159,10 +159,10 @@ app.post("/login", async (req, res) => {
       await user.save();
     }
 
-    // Send OTP via SendGrid
+    
     const msg = {
       to: email,
-      from: process.env.EMAIL_FROM, // Ensure this is a verified sender in SendGrid
+      from: process.env.EMAIL_FROM, 
       subject: "Your OTP",
       html: `<h3>Your OTP is: ${otp}</h3>`,
     };
