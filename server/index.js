@@ -166,6 +166,26 @@ app.post("/login", async (req, res) => {
     sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
 
     console.log("OTP:", otp);
+     
+    try {
+      await sgMail.send({
+        to: email,
+        from: process.env.EMAIL_FROM,
+        subject: "Order Confirmation",
+        text: `Order placed successfully. Total ₹${totalPrice}`,
+      });
+      console.log("Email sent");
+    } catch (err) {
+      console.error("Email failed:", err.message);
+    }
+
+    res.json({ message: "Order placed successfully" });
+
+  } catch (err) {
+    console.error("PLACE ORDER ERROR:", err);
+    res.status(500).json({ error: err.message });
+  }
+})
 
   } catch (err) {
     console.error("LOGIN ERROR:", err);
@@ -217,17 +237,7 @@ app.post("/verify-otp", async (req, res) => {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
-    try {
-      await sgMail.send({
-        to: email,
-        from: process.env.EMAIL_FROM,
-        subject: "Order Confirmation",
-        text: `Order placed successfully. Total ₹${totalPrice}`,
-      });
-      console.log("Email sent");
-    } catch (err) {
-      console.error("Email failed:", err.message);
-    }
+   
 
     res.json({ message: "Order placed successfully", email: user.email, user_id: user._id });
 
