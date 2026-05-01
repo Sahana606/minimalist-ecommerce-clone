@@ -159,25 +159,12 @@ app.post("/login", async (req, res) => {
       await user.save();
     }
 
-
-    sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
+  
+    await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
     console.log("OTP:", otp);
 
-   
-    try {
-      await sgMail.send({
-        to: email,
-        from: process.env.EMAIL_FROM,
-        subject: "Order Confirmation",
-        text: `Order placed successfully. Total ₹${totalPrice}`,
-      });
-      console.log("Email sent");
-    } catch (err) {
-      console.error("Email failed:", err.message);
-    }
 
-   
-    res.json({ message: "OTP sent and order processed successfully" });
+    res.json({ message: "OTP sent successfully" });
 
   } catch (err) {
     console.error("LOGIN/ORDER ERROR:", err);
