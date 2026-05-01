@@ -29,7 +29,7 @@ function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
       productName: item.name,
       quantity: item.qty || 1,
       price: item.price,
-      image: item.image ? item.image[0] : ""
+      image: item.images ? item.images[0] : ""
     }));
 
     try {
