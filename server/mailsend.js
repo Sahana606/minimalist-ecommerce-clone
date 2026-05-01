@@ -1,20 +1,20 @@
-const nodemailer = require('nodemailer');
-const transporter = nodemailer.createTransport(
-    {
-        secure:true,
-        host:'smtp.gmail.com',
-        port:465,
-        auth:{
-            user:'acharyasahana081@gmail.com',
-            pass:'sjdnkmysjsxwpdce'
-        },
-        tls:{
-            rejectUnauthorized:false
-        }
+// const nodemailer = require('nodemailer');
+// const transporter = nodemailer.createTransport(
+//     {
+//         secure:true,
+//         host:'smtp.gmail.com',
+//         port:465,
+//         auth:{
+//             user:'acharyasahana081@gmail.com',
+//             pass:'sjdnkmysjsxwpdce'
+//         },
+//         tls:{
+//             rejectUnauthorized:false
+//         }
 
 
-    }
-);
+//     }
+// );
 
 async function sendMail(to, sub, msg) {
   try {
