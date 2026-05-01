@@ -209,15 +209,15 @@ app.put("/user/:email", async (req, res) => {
 
 // VERIFY OTP
 app.post("/verify-otp", async (req, res) => {
-  const { email, otp } = req.body;
-  const user = await UserModel.findOne({ email });
+  try {
+    const { email, otp } = req.body;
+    const user = await UserModel.findOne({ email });
 
-  if (!user || user.otp !== otp || user.otpExpires < new Date()) {
-    return res.status(400).json({ error: "Invalid OTP" });
-  }
+    if (!user || user.otp !== otp || user.otpExpires < new Date()) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
 
-  res.json({ email: user.email, user_id: user._id });
-   try {
+    try {
       await sgMail.send({
         to: email,
         from: process.env.EMAIL_FROM,
@@ -229,7 +229,7 @@ app.post("/verify-otp", async (req, res) => {
       console.error("Email failed:", err.message);
     }
 
-    res.json({ message: "Order placed successfully" });
+    res.json({ message: "Order placed successfully", email: user.email, user_id: user._id });
 
   } catch (err) {
     console.error("otp error:", err);
