@@ -362,7 +362,7 @@ app.post("/place-order", async (req, res) => {
     console.error("PLACE ORDER ERROR:", err);
     res.status(500).json({ error: err.message });
   }
-})
+});
 
 
 // USER ORDERS
