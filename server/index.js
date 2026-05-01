@@ -159,10 +159,16 @@ app.post("/login", async (req, res) => {
       await user.save();
     }
 
-  
-    await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
-    console.log("OTP:", otp);
+    // Send OTP via SendGrid
+    const msg = {
+      to: email,
+      from: process.env.EMAIL_FROM, // Ensure this is a verified sender in SendGrid
+      subject: "Your OTP",
+      html: `<h3>Your OTP is: ${otp}</h3>`,
+    };
 
+    await sgMail.send(msg);
+    console.log("OTP Email sent via SendGrid:", otp);
 
     res.json({ message: "OTP sent successfully" });
 
