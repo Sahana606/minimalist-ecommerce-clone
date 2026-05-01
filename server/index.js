@@ -145,7 +145,7 @@ app.get("/user/:email", async (req, res) => {
 });
 app.post("/login", async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email, totalPrice = 0 } = req.body;
     let user = await UserModel.findOne({ email });
 
     const otp = generateOTP();
@@ -159,14 +159,11 @@ app.post("/login", async (req, res) => {
       await user.save();
     }
 
- 
-    res.json({ message: "OTP sent" });
-
-    
+    // Send OTP via email/service
     sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
-
     console.log("OTP:", otp);
-     
+
+    // Attempt to send order confirmation
     try {
       await sgMail.send({
         to: email,
@@ -179,17 +176,12 @@ app.post("/login", async (req, res) => {
       console.error("Email failed:", err.message);
     }
 
-    res.json({ message: "Order placed successfully" });
+    // Send final success response
+    res.json({ message: "OTP sent and order processed successfully" });
 
   } catch (err) {
-    console.error("PLACE ORDER ERROR:", err);
+    console.error("LOGIN/ORDER ERROR:", err);
     res.status(500).json({ error: err.message });
-  }
-})
-
-  } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    res.status(500).json({ error: "Server error" });
   }
 });
 
