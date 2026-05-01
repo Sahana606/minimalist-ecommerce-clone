@@ -291,7 +291,7 @@ app.post("/place-order", async (req, res) => {
     try {
       await sgMail.send({
         to: email,
-        from: process.env.SENDGRID_VERIFIED_EMAIL,
+        from: process.env.EMAIL_FROM,
         subject: "Order Confirmation",
         text: `Order placed successfully. Total ₹${totalPrice}`,
       });
