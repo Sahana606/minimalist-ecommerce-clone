@@ -306,7 +306,7 @@ app.post("/place-order", async (req, res) => {
   try {
     console.log("Incoming:", req.body);
 
-    const { email, items, totalPrice } = req.body;
+    const { email, items, totalPrice, paymentMethod, paymentStatus } = req.body;
 
     if (!email || !items || !totalPrice) {
       return res.status(400).json({ error: "Missing required fields" });
@@ -318,32 +318,40 @@ app.post("/place-order", async (req, res) => {
     });
 
     await order.save();
-   if ((paymentMethod === "ONLINE" && paymentStatus === "Paid") || paymentMethod === "COD") {
+    console.log("Order saved");
+
+  
+    if ((paymentMethod === "ONLINE" && paymentStatus === "Paid") || paymentMethod === "COD") {
       const buffers = [];
       pdfService.buildPDF(
         order,
         (chunk) => buffers.push(chunk),
         async () => {
-          const pdfData = Buffer.concat(buffers);
-         const subject = paymentMethod === "COD" ? "Order Confirmed - Cash on Delivery" : "Payment Successful & Invoice";
-          const message = `
-            <h2><strong>Payment Successful</strong></h2>
-            <p>Your order has been placed successfully.</p>
+          try {
+            const pdfData = Buffer.concat(buffers);
+            const subject = paymentMethod === "COD" ? "Order Confirmed - Cash on Delivery" : "Payment Successful & Invoice";
+            const message = `
+              <h2><strong>Payment Successful</strong></h2>
+              <p>Your order has been placed successfully.</p>
               <p><strong>Total:</strong> ₹${totalPrice}</p>
               <p><strong>Payment Method:</strong> ${paymentMethod}</p>         
               <p><strong>Please find your invoice attached.</strong></p>
-          `;
+            `;
 
-          await sendMail(email, subject, message, [
-            {
-              filename: "invoice.pdf",
-              content: pdfData,
-            },
-          ]);
-        } 
-    console.log("Order saved");
+            await sendMail(email, subject, message, [
+              {
+                filename: "invoice.pdf",
+                content: pdfData,
+              },
+            ]);
+          } catch (err) {
+            console.error("Error sending invoice email:", err);
+          }
+        }
+      );
+    }
 
-    
+
     try {
       await sgMail.send({
         to: email,
@@ -365,18 +373,18 @@ app.post("/place-order", async (req, res) => {
 });
 
 
-// USER ORDERS
+
 app.get("/user-orders/:email", async (req, res) => {
   const orders = await OrderModel.find({ email: req.params.email });
   res.json(orders);
 });
 
-// ADMIN ORDERS
+
 app.get("/admin/orders", async (req, res) => {
   res.json(await OrderModel.find());
 });
 
-// UPDATE ORDER
+
 app.put("/admin/update-order/:id", async (req, res) => {
   const order = await OrderModel.findByIdAndUpdate(
     req.params.id,
@@ -386,7 +394,7 @@ app.put("/admin/update-order/:id", async (req, res) => {
   res.json(order);
 });
 
-// DELETE ORDER
+
 app.delete("/admin/delete-order/:id", async (req, res) => {
   await OrderModel.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });
