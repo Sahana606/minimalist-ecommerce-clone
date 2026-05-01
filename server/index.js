@@ -256,7 +256,6 @@ app.get("/products/:id", async (req, res) => {
   res.json(await Product.findById(req.params.id));
 });
 
-// ADD PRODUCT
 app.post("/admin/add-product", parser.single("image"), async (req, res) => {
   const product = new Product({
     ...req.body,
