@@ -95,37 +95,6 @@ function generateOTP() {
   });
 }
 
-// async function sendMail(to, subject, html) {
-//   const transporter = nodemailer.createTransport({
-//     service: "gmail",
-//     auth: {
-//       user: process.env.EMAIL_USER,
-//       pass: process.env.EMAIL_PASS,
-//     },
-//   });
-//   await transporter.sendMail({ from: process.env.EMAIL_USER, to, subject, html });
-// }
-
-
-
-// LOGIN
-// app.post("/login", async (req, res) => {
-//   const { email } = req.body;
-//   let user = await UserModel.findOne({ email });
-
-//   const otp = generateOTP();
-//   const otpExpires = new Date(Date.now() + 5 * 60 * 1000);
-
-//   if (!user) user = await UserModel.create({ email, otp, otpExpires });
-//   else {
-//     user.otp = otp;
-//     user.otpExpires = otpExpires;
-//     await user.save();
-//   }
-
-//   await sendMail(email, "Your OTP", `<h3>${otp}</h3>`);
-//   res.json({ message: "OTP sent" });
-// });
 
 app.get("/user/:email", async (req, res) => {
   try {
@@ -233,7 +202,7 @@ app.post("/verify-otp", async (req, res) => {
   }
 });
 
-// RESEND OTP
+
 app.post("/resend-otp", async (req, res) => {
   const { email } = req.body;
   const user = await UserModel.findOne({ email });
@@ -247,7 +216,7 @@ app.post("/resend-otp", async (req, res) => {
   res.json({ message: "OTP resent" });
 });
 
-// PRODUCTS
+
 app.get("/products", async (req, res) => {
   res.json(await Product.find());
 });
@@ -265,13 +234,12 @@ app.post("/admin/add-product", parser.single("image"), async (req, res) => {
   res.json({ message: "Product added" });
 });
 
-// UPDATE PRODUCT
 app.put("/admin/update-product/:id", async (req, res) => {
   const updated = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
   res.json(updated);
 });
 
-// DELETE PRODUCT
+
 app.delete("/delete-product/:id", async (req, res) => {
   try {
     await Product.findByIdAndDelete(req.params.id);
@@ -400,7 +368,7 @@ app.delete("/admin/delete-order/:id", async (req, res) => {
   res.json({ message: "Deleted" });
 });
 
-// RAZORPAY
+
 app.post("/create-razorpay-order", async (req, res) => {
   const order = await razorpay.orders.create({
     amount: req.body.amount * 100,
