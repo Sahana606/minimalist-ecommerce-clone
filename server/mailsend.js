@@ -19,7 +19,7 @@
 async function sendMail(to, sub, msg) {
   try {
     await transporter.sendMail({
-      from: "acharyasahana081@gmail.com",
+      from: "proceess.env.EMAIL_FROM",
       to: to,
       subject: sub,
       html: msg
