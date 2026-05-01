@@ -57,9 +57,7 @@ function ProductDetails({ addToCart }) {
               name: product.name,
               price: product.price,
               desc: product.description,
-              images: [
-                `https://minimalist-ecommerce-clone.onrender.com/uploads/${product.image}`
-              ],
+              images: product.image,
               qty: 1
             })
           }
