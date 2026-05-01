@@ -9,7 +9,7 @@ const Razorpay = require("razorpay");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const sgMail = require("@sendgrid/mail");
-
+const pdfserver = require("./pdf-server");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -282,6 +282,26 @@ app.delete("/delete-product/:id", async (req, res) => {
 });
 
 
+app.get("/invoice/:id", async (req, res) => {
+  try {
+    const order = await OrderModel.findById(req.params.id);
+
+    res.writeHead(200, {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": "attachment; filename=invoice.pdf",
+    });
+
+    pdfService.buildPDF(
+      order,
+      (chunk) => res.write(chunk),
+      () => res.end()
+    );
+  } catch (err) {
+    res.status(500).json({ error: "Error generating invoice" });
+  }
+});
+
+
 app.post("/place-order", async (req, res) => {
   try {
     console.log("Incoming:", req.body);
@@ -298,6 +318,29 @@ app.post("/place-order", async (req, res) => {
     });
 
     await order.save();
+   if ((paymentMethod === "ONLINE" && paymentStatus === "Paid") || paymentMethod === "COD") {
+      const buffers = [];
+      pdfService.buildPDF(
+        order,
+        (chunk) => buffers.push(chunk),
+        async () => {
+          const pdfData = Buffer.concat(buffers);
+         const subject = paymentMethod === "COD" ? "Order Confirmed - Cash on Delivery" : "Payment Successful & Invoice";
+          const message = `
+            <h2><strong>Payment Successful</strong></h2>
+            <p>Your order has been placed successfully.</p>
+              <p><strong>Total:</strong> ₹${totalPrice}</p>
+              <p><strong>Payment Method:</strong> ${paymentMethod}</p>         
+              <p><strong>Please find your invoice attached.</strong></p>
+          `;
+
+          await sendMail(email, subject, message, [
+            {
+              filename: "invoice.pdf",
+              content: pdfData,
+            },
+          ]);
+        } 
     console.log("Order saved");
 
     
