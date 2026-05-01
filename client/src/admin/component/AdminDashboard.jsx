@@ -41,18 +41,17 @@ function AdminDashboard() {
         setTotalProducts(productsRes.data.length);
         setTotalUsers(usersRes.data.length);
 
-        // Revenue
         const revenue = orders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
         setTotalRevenue(revenue);
 
-        // Recent Orders
+ 
         const latest = [...orders]
           .sort((a, b) => new Date(b.datetime) - new Date(a.datetime))
           .slice(0, 5);
 
         setRecentOrders(latest);
 
-        // Revenue Chart
+     
         const grouped = {};
         orders.forEach(order => {
           const date = new Date(order.datetime).toLocaleDateString();
@@ -86,7 +85,7 @@ function AdminDashboard() {
   return (
     <div>
 
-      {/* NAVBAR */}
+     
       <div className="nav-container">
         <nav className="admin-nav">
           <Link to="/admin/dashboard" className="admin-logo">
@@ -99,7 +98,7 @@ function AdminDashboard() {
 
       <div className="admin-container">
 
-        {/* SIDEBAR */}
+     
         <div className="sidebar">
           <Link to="/admin/add-product">Add Product</Link>
          <Link to="/admin/manage-products">Manage Product</Link>
@@ -107,7 +106,7 @@ function AdminDashboard() {
           <Link to="/admin/manage-users">Manage Users</Link>
         </div>
 
-        {/* ROUTING */}
+       
         {location.pathname.startsWith("/admin/update-product") ? (
           <EditProduct />
 
@@ -134,12 +133,12 @@ function AdminDashboard() {
 
         ) : (
 
-          /* DASHBOARD UI */
+         
           <div className="dashboard-main-content">
 
             <h2>Welcome to Admin Dashboard</h2>
 
-            {/* STATS */}
+        
             <div className="stats-grid">
               <div>Total Products: {totalProducts}</div>
               <div>Total Orders: {totalOrders}</div>
@@ -161,7 +160,7 @@ function AdminDashboard() {
               </ResponsiveContainer>
             </div>
 
-            {/* RECENT ORDERS */}
+           
             <div style={{ marginTop: "30px" }}>
               <h3>Recent Orders</h3>
 
