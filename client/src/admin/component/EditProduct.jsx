@@ -22,7 +22,7 @@ function EditProduct() {
     const getProduct = async () => {
       try {
         const res = await axios.get(
-          `https://minimalist-ecommerce-clone.onrender.com/products/${id}`
+          `${import.meta.env.VITE_API_URL}/products/${id}`
         );
 
         setProduct({
@@ -65,7 +65,7 @@ function EditProduct() {
 
     try {
       await axios.put(
-        `https://minimalist-ecommerce-clone.onrender.com/admin/update-product/${id}`,
+        `${import.meta.env.VITE_API_URL}/admin/update-product/${id}`,
         formData
       );
 
