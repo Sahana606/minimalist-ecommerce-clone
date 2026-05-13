@@ -14,7 +14,7 @@ function Shop() {
     const getProducts = async () => {
       try {
         const res = await axios.get(
-          "https://minimalist-ecommerce-clone.onrender.com/products"
+          `${import.meta.env.VITE_API_URL}/products`
         );
 
         setproducts(res.data); 
@@ -30,9 +30,9 @@ function Shop() {
     <>
       <Header />
       <div id="shopby"><h1>Collections</h1></div>
-
       <div className="c1">
-        {addproducts.map((product) => (
+        {Array.isArray(addproducts) && addproducts.map((product) => (
+          
           <div
             key={product._id}
             className="card2"
