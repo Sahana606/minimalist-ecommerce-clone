@@ -20,7 +20,7 @@ function Header({ setShowCart }) {
 
       try {
         const res = await axios.get(
-          "https://minimalist-ecommerce-clone.onrender.com/products"
+          `${import.meta.env.VITE_API_URL}/products`
         );
 
       const filtered = res.data.filter((p) =>
@@ -116,7 +116,7 @@ function Header({ setShowCart }) {
                       setShowSearch(false);
                     }}
                   >
-                   <img src={`https://minimalist-ecommerce-clone.onrender.com/uploads/${item.image}`} />
+                   <img src={item.image} />
 <p>{item.name}</p>
 <p>₹{item.price}</p>
                   </div>
