@@ -11,7 +11,7 @@ useEffect(() => {
    
     const getUsers = async () => {
       try {
-        const res = await axios.get("https://minimalist-ecommerce-clone.onrender.com/admin/manage-users");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/manage-users`);
         setUsers(res.data); 
       } catch (err) {
         console.error("Error fetching users:", err);
@@ -23,7 +23,7 @@ useEffect(() => {
 
   const handleDelete = async (id) => {
   try {
-    await axios.delete(`https://minimalist-ecommerce-clone.onrender.com/delete-user/${id}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/delete-user/${id}`);
     setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
   } catch (err) {
     console.error("Error deleting user:", err);
