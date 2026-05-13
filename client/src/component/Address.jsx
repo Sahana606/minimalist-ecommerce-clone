@@ -1,62 +1,95 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../style.css";
 
-function Address() {
+function ManageUsers() {
+
+  const [users,setUsers] = useState([]);
   const navigate = useNavigate();
 
-  const [address, setAddress] = useState({
-    name: "",
-    phone: "",
-    address: "",
-    city: "",
-    district: "",
-    state: "",
-    pincode: ""
-  });
+useEffect(() => {
+   
+    const getUsers = async () => {
+      try {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/manage-users`);
+        setUsers(res.data); 
+      } catch (err) {
+        console.error("Error fetching users:", err);
+      }
+    };
 
-  const handleChange = (e) => {
-    setAddress({ ...address, [e.target.name]: e.target.value });
-  };
+    getUsers(); 
+  }, []);
 
-  const handleSubmit = () => {
-    localStorage.setItem("address", JSON.stringify(address));
-    navigate("/payment");
-  };
+  const handleDelete = async (id) => {
+  try {
+    await axios.delete(`${import.meta.env.VITE_API_URL}/delete-user/${id}`);
+    setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
+  } catch (err) {
+    console.error("Error deleting user:", err);
+  }
+};
 
   return (
-    <div className="address-page">
-      <div className="address-box">
-        <h2>Delivery Address</h2>
 
-        <div className="form-group">
-          <input name="name" placeholder="Full Name" onChange={handleChange} />
-        </div>
+    <div className="manage-product-card">
 
-        <div className="form-group">
-          <input name="phone" placeholder="Phone Number" onChange={handleChange} />
-        </div>
+      <h2 className="manage-card-title">Manage Users</h2>
 
-        <div className="form-group">
-          <textarea name="address" placeholder="House No, Street, Area" onChange={handleChange}></textarea>
-        </div>
+      <div className="manage-table-container">
 
-        <div className="row">
-          <input name="city" placeholder="City" onChange={handleChange} />
-          <input name="district" placeholder="District" onChange={handleChange} />
-        </div>
+        <table className="table table-bordered product-table">
 
-        <div className="row">
-          <input name="state" placeholder="State" onChange={handleChange} />
-          <input name="pincode" placeholder="Pincode" onChange={handleChange} />
-        </div>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Email</th>
+              <th>OTP</th>
+              <th>OTP Expiry</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
 
-        <button className="save-btn" onClick={handleSubmit}>
-          Save & Continue
-        </button>
+          <tbody>
+
+            {users.map((u)=>(
+              <tr key={u._id}>
+
+                <td>{u._id}</td>
+                <td>{u.email}</td>
+                <td>{u.otp}</td>
+                <td>{new Date(u.otpExpires).toLocaleString()}</td>
+
+                <td>
+
+                  <button
+                    className="edit-btn"
+                    onClick={()=>navigate(`/admin/edit-user/${u._id}`)}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    className="delete-btn"
+                    onClick={()=>handleDelete(u._id)}
+                  >
+                    Delete
+                  </button>
+
+                </td>
+
+              </tr>
+            ))}
+
+          </tbody>
+
+        </table>
+
       </div>
+
     </div>
+
   );
 }
 
-export default Address;
+export default ManageUsers;
