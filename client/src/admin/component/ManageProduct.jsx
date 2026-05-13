@@ -10,7 +10,7 @@ function ManageProduct() {
   const getProducts = async () => {
     try {
       const res = await axios.get(
-        "https://minimalist-ecommerce-clone.onrender.com/products"
+        `${import.meta.env.VITE_API_URL}/products`
       );
       setProducts(res.data);
     } catch (err) {
@@ -25,7 +25,7 @@ function ManageProduct() {
   const deleteProduct = async (id) => {
     try {
       await axios.delete(
-        `https://minimalist-ecommerce-clone.onrender.com/delete-product/${id}`
+        `${import.meta.env.VITE_API_URL}/delete-product/${id}`
       );
       setProducts(products.filter((p) => p._id !== id));
     } catch (err) {
