@@ -1,28 +1,26 @@
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 function NewLaunch({ addToCart }) {
+  const [addproducts, setproducts] = useState([]);
+  const navigate = useNavigate();
 
-  const [addproducts, setproducts] = useState("");
-const navigate = useNavigate();
   useEffect(() => {
     const getProducts = async () => {
       try {
-
-        const data = await axios.get(
-          "https://minimalist-ecommerce-clone.onrender.com/products"
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/products`
         );
 
-        setproducts(data);
-
+        setproducts(res.data); 
       } catch (err) {
         console.log(err);
       }
     };
 
     getProducts();
-
   }, []);
 
   return (
@@ -32,44 +30,44 @@ const navigate = useNavigate();
       </div>
 
       <div className="c1">
-        {addproducts && addproducts?.data
-          .filter((product) => product.section === "newlaunch")
-          .map((product) => (
-         <div
-  className="card2"
-  key={product._id}
-  onClick={() => {
-    console.log("clicked"); 
-    navigate(`/product/${product._id}`);
-  }}
->
+        {Array.isArray(addproducts) &&
+          addproducts
+            .filter((product) => product.section === "newlaunch")
+            .map((product) => (
+              <div
+                className="card2"
+                key={product._id}
+                onClick={() => {
+                  navigate(`/product/${product._id}`);
+                }}
+              >
+                <img
+                  src={product.image}
+                  width="300"
+                  height="400"
+                  alt={product.name}
+                />
 
-              <img
-                src={product.image}
-                width="300"
-                height="400"
-                alt=""
-              />
+                <h2>
+                  <b>{product.name}</b>
+                </h2>
+                <h4>{"₹" + product.price}</h4>
+                <h4>{product.description}</h4>
 
-              <h2><b>{product.name}</b></h2>
-              <h4>{"₹" + product.price}</h4>
-               <h4>{product.description}</h4>
-              
-
-               <button
-  className="button"
-  onClick={() =>
-    addToCart({
-      ...product,
-      images: [product.image] // wrap the single image in an array
-    })
-  }
->
-                Add to Cart
-              </button>
-
-            </div>
-          ))}
+                <button
+                  className="button"
+                  onClick={(e) => {
+                    e.stopPropagation(); 
+                    addToCart({
+                      ...product,
+                      images: [product.image],
+                    });
+                  }}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            ))}
       </div>
     </>
   );
