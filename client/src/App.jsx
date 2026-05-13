@@ -12,7 +12,7 @@ import Otppage from "./component/Otppage";
 import Search from "./component/Search";
 import Profile from "./component/Profile";
 import Address from "./component/Address";
-
+import Checkout from "./component/Checkout";
 import AdminLogin from "./admin/component/AdminLogin";
 import AdminDashboard from "./admin/component/AdminDashboard";
 import ManageOrders from "./admin/component/ManageOrders";
@@ -23,6 +23,8 @@ import EditProduct from "./admin/component/EditProduct";
 import CartSidebar from "./component/CartSidebar";
 import Payment from "./component/Payment";
 import ProductDetails from "./component/ProductDetails";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 
 function App() {
@@ -63,10 +65,13 @@ const isLoggedIn = localStorage.getItem("email");
 
         <Route path="/login" element={<Login />} />
         <Route path="/otp" element={<Otppage />} />
-       <Route
+         <Route path="/profile" element={<Profile />} />
+       {/* <Route
   path="/profile"
   element={isLoggedIn ? <Profile /> : <Login />}
-/>
+/> */}
+
+
        
     <Route
   path="/payment"
@@ -92,7 +97,10 @@ const isLoggedIn = localStorage.getItem("email");
   path="/product/:id"
   element={<ProductDetails addToCart={addToCart} />}
 />
-
+<Route
+  path="/checkout"
+  element={<Checkout cart={cart} />}
+/>
         
         <Route path="/admin/login" element={<AdminLogin />} />
          <Route path="/admin/admindashboard" element={<AdminDashboard />} /> 
@@ -100,21 +108,19 @@ const isLoggedIn = localStorage.getItem("email");
         <Route path="/admin/manage-products" element={<AdminDashboard />} />
         <Route path="/admin/manage-users" element={<AdminDashboard />} />
         <Route path="/admin/manage-order" element={<AdminDashboard />} />
-        <Route path="/admin/edit-users" element={<AdminDashboard />} /> 
+        <Route path="/admin/edit-user/:id" element={<AdminDashboard />} />
 
         <Route
           path="/admin/update-product/:id"
-          element={<EditProduct />}
-        />
-
-        <Route
-          path="/admin/edit-order"
           element={<AdminDashboard />}
         />
 
         <Route
-          path="/admin/user-orders/:id"
-          element={<AdminDashboard />}
+  path="/admin/edit-order/:id"
+  element={<EditOrder />}
+/>
+
+        <Route path="/admin/user-orders/:id" element={<AdminDashboard />}
         />
 
       </Routes>
