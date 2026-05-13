@@ -35,7 +35,7 @@ function Login() {
   navigate("/otp", { state: { email } });
 
   axios.post(
-    "https://minimalist-ecommerce-clone.onrender.com/login",
+    `${import.meta.env.VITE_API_URL}/login`,
     { email }
   ).catch(err => console.log(err));
 };
