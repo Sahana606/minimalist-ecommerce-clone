@@ -30,7 +30,7 @@ function Otppage() {
 
     try {
       const res = await axios.post(
-        "https://minimalist-ecommerce-clone.onrender.com/verify-otp",
+        `${import.meta.env.VITE_API_URL}/verify-otp`,
         { email, otp: finalOtp }
       );
 
@@ -56,7 +56,7 @@ function Otppage() {
   const handleResend = async () => {
     try {
       await axios.post(
-        "https://minimalist-ecommerce-clone.onrender.com/resend-otp",
+        `${import.meta.env.VITE_API_URL}/resend-otp`,
         { email }
       );
       setCounter(60);
