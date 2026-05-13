@@ -41,7 +41,7 @@ function AddProduct() {
 
     try {
       await axios.post(
-        "https://minimalist-ecommerce-clone.onrender.com/admin/add-product",
+        `${import.meta.env.VITE_API_URL}/admin/add-product`,
         formData,
         {
           headers: {
