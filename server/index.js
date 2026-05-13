@@ -1,4 +1,4 @@
-const { CloudinaryStorage } = require( "multer-storage-cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -7,12 +7,12 @@ const otpGenerator = require("otp-generator");
 const nodemailer = require("nodemailer");
 const multer = require("multer");
 const Razorpay = require("razorpay");
-const cloudinary = require("cloudinary").v2;
 
 const sgMail = require("@sendgrid/mail");
 const pdfserver = require("./pdf-server");
 const app = express();
 const PORT = process.env.PORT || 3001;
+const cloudinary = require('cloudinary').v2;
 
 
 const allowedOrigins = [
@@ -148,6 +148,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
 app.get("/admin/manage-users", async (req, res) => {
   try {
     const users = await UserModel.find().sort({ createdAt: -1 }); 
@@ -155,6 +156,34 @@ app.get("/admin/manage-users", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Error fetching users" });
+  }
+});
+app.put("/admin/update-user/:id", async (req, res) => {
+  try {
+
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      req.params.id,
+      {
+        email: req.body.email,
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
+    res.json(updatedUser);
+
+  } catch (err) {
+
+    console.error("UPDATE USER ERROR:", err);
+
+    res.status(500).json({
+      error: "Update failed",
+    });
   }
 });
 
@@ -182,7 +211,7 @@ app.put("/user/:email", async (req, res) => {
   }
 });
 
-// VERIFY OTP
+
 app.post("/verify-otp", async (req, res) => {
   try {
     const { email, otp } = req.body;
@@ -270,76 +299,301 @@ app.get("/invoice/:id", async (req, res) => {
 });
 
 
+// app.post("/place-order", async (req, res) => {
+//   try {
+//     console.log("Incoming:", req.body);
+
+//     const { email, items, totalPrice, paymentMethod, paymentStatus } = req.body;
+
+//     if (!email || !items || !totalPrice) {
+//       return res.status(400).json({ error: "Missing required fields" });
+//     }
+
+//     const order = new OrderModel({
+//       ...req.body,
+//       email: email.toLowerCase(),
+//     });
+
+//     await order.save();
+//     console.log("Order saved");
+
+  
+//     if ((paymentMethod === "ONLINE" && paymentStatus === "Paid") || paymentMethod === "COD") {
+//       const buffers = [];
+//       pdfService.buildPDF(
+//         order,
+//         (chunk) => buffers.push(chunk),
+//         async () => {
+//           try {
+//             const pdfData = Buffer.concat(buffers);
+//             const subject = paymentMethod === "COD" ? "Order Confirmed - Cash on Delivery" : "Payment Successful & Invoice";
+//             const message = `
+//               <h2><strong>Payment Successful</strong></h2>
+//               <p>Your order has been placed successfully.</p>
+//               <p><strong>Total:</strong> ₹${totalPrice}</p>
+//               <p><strong>Payment Method:</strong> ${paymentMethod}</p>         
+//               <p><strong>Please find your invoice attached.</strong></p>
+//             `;
+
+//             await sendMail(email, subject, message, [
+//               {
+//                 filename: "invoice.pdf",
+//                 content: pdfData,
+//               },
+//             ]);
+//           } catch (err) {
+//             console.error("Error sending invoice email:", err);
+//           }
+//         }
+//       );
+//     }
+
+
+//     try {
+//       await sgMail.send({
+//         to: email,
+//         from: process.env.EMAIL_FROM,
+//         subject: "Order Confirmation",
+//         text: `Order placed successfully. Total ₹${totalPrice}`,
+//       });
+//       console.log("Email sent");
+//     } catch (err) {
+//       console.error("Email failed:", err.message);
+//     }
+
+//     res.json({ message: "Order placed successfully" });
+
+//   } catch (err) {
+//     console.error("PLACE ORDER ERROR:", err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+
+// app.post("/place-order", async (req, res) => {
+//   try {
+//     console.log("Incoming:", req.body);
+
+//     const {
+//       email,
+//       items,
+//       totalPrice,
+//       paymentMethod,
+//       paymentStatus,
+//     } = req.body;
+
+//     console.log("EMAIL:", email);
+//     console.log("ITEMS:", items);
+//     console.log("TOTAL:", totalPrice);
+
+//     if (
+//       !email ||
+//       !items ||
+//       items.length === 0 ||
+//       totalPrice == null
+//     ) {
+//       return res.status(400).json({
+//         error: "Missing required fields",
+//       });
+//     }
+
+//     const order = new OrderModel({
+//       ...req.body,
+//       email: email.toLowerCase(),
+//     });
+
+//     await order.save();
+
+//     console.log("Order saved");
+
+//     if (
+//       (paymentMethod === "ONLINE" &&
+//         paymentStatus?.toLowerCase() ===
+//           "paid") ||
+//       paymentMethod === "COD"
+//     ) {
+//       const buffers = [];
+
+//       pdfserver.buildPDF(
+//         order,
+
+//         (chunk) => {
+//           buffers.push(chunk);
+//         },
+
+//         async () => {
+//           try {
+//             const pdfData =
+//               Buffer.concat(buffers);
+
+//             await sendMail(
+//               email,
+
+//               paymentMethod === "COD"
+//                 ? "Order Confirmed - Cash on Delivery"
+//                 : "Payment Successful & Invoice",
+
+//               `
+//               <h2>Payment Successful</h2>
+
+//               <p>Your order has been placed successfully.</p>
+
+//               <p>Total: ₹${totalPrice}</p>
+
+//               <p>Payment Method: ${paymentMethod}</p>
+//               `,
+
+//               [
+//                 {
+//                   content:
+//                     pdfData.toString(
+//                       "base64"
+//                     ),
+
+//                   filename:
+//                     "invoice.pdf",
+
+//                   type:
+//                     "application/pdf",
+
+//                   disposition:
+//                     "attachment",
+//                 },
+//               ]
+//             );
+
+//             console.log("Invoice sent");
+//           } catch (err) {
+//             console.error(
+//               "PDF EMAIL ERROR:",
+//               err
+//             );
+//           }
+//         }
+//       );
+//     }
+
+//     res.json({
+//       message:
+//         "Order placed successfully",
+//     });
+
+//   } catch (err) {
+//     console.error(
+//       "PLACE ORDER ERROR:",
+//       err
+//     );
+
+//     res.status(500).json({
+//       error: err.message,
+//     });
+//   }
+// });
+
 app.post("/place-order", async (req, res) => {
   try {
     console.log("Incoming:", req.body);
 
-    const { email, items, totalPrice, paymentMethod, paymentStatus } = req.body;
+    const {
+      user_id,
+      email,
+      items,
+      subtotal,
+      gst,
+      totalPrice,
+      address,
+      paymentMethod,
+      paymentStatus,
+      datetime,
+    } = req.body;
 
-    if (!email || !items || !totalPrice) {
-      return res.status(400).json({ error: "Missing required fields" });
+    if (!email || !items || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields",
+      });
     }
 
     const order = new OrderModel({
-      ...req.body,
+      user_id,
       email: email.toLowerCase(),
+      items,
+      subtotal,
+      gst,
+      totalPrice,
+      address,
+      paymentMethod,
+      paymentStatus,
+      datetime,
     });
 
     await order.save();
+
     console.log("Order saved");
 
-  
-    if ((paymentMethod === "ONLINE" && paymentStatus === "Paid") || paymentMethod === "COD") {
-      const buffers = [];
-      pdfService.buildPDF(
-        order,
-        (chunk) => buffers.push(chunk),
-        async () => {
-          try {
-            const pdfData = Buffer.concat(buffers);
-            const subject = paymentMethod === "COD" ? "Order Confirmed - Cash on Delivery" : "Payment Successful & Invoice";
-            const message = `
-              <h2><strong>Payment Successful</strong></h2>
-              <p>Your order has been placed successfully.</p>
+    const buffers = [];
+
+    pdfserver.buildPDF(
+      order,
+      (chunk) => {
+        buffers.push(chunk);
+      },
+      async () => {
+        try {
+          const pdfData = Buffer.concat(buffers);
+
+          await sgMail.send({
+            to: email,
+            from: process.env.EMAIL_FROM,
+            subject:
+              paymentMethod === "COD"
+                ? "Order Confirmed - Cash on Delivery"
+                : "Payment Successful & Invoice",
+
+            html: `
+              <h2>Order Placed Successfully</h2>
+
+              <p>Thank you for shopping with Minimalist.</p>
+
               <p><strong>Total:</strong> ₹${totalPrice}</p>
-              <p><strong>Payment Method:</strong> ${paymentMethod}</p>         
-              <p><strong>Please find your invoice attached.</strong></p>
-            `;
 
-            await sendMail(email, subject, message, [
+              <p><strong>Payment Method:</strong> ${paymentMethod}</p>
+
+              <p>Your invoice is attached below.</p>
+            `,
+
+            attachments: [
               {
+                content: pdfData.toString("base64"),
                 filename: "invoice.pdf",
-                content: pdfData,
+                type: "application/pdf",
+                disposition: "attachment",
               },
-            ]);
-          } catch (err) {
-            console.error("Error sending invoice email:", err);
-          }
+            ],
+          });
+
+          console.log("Invoice email sent");
+        } catch (mailErr) {
+          console.log("EMAIL ERROR:", mailErr);
         }
-      );
-    }
+      }
+    );
 
-
-    try {
-      await sgMail.send({
-        to: email,
-        from: process.env.EMAIL_FROM,
-        subject: "Order Confirmation",
-        text: `Order placed successfully. Total ₹${totalPrice}`,
-      });
-      console.log("Email sent");
-    } catch (err) {
-      console.error("Email failed:", err.message);
-    }
-
-    res.json({ message: "Order placed successfully" });
-
+    res.status(200).json({
+      success: true,
+      message: "Order placed successfully",
+      order,
+    });
   } catch (err) {
-    console.error("PLACE ORDER ERROR:", err);
-    res.status(500).json({ error: err.message });
+    console.log("PLACE ORDER ERROR:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message,
+      error: err,
+    });
   }
 });
-
 
 
 app.get("/user-orders/:email", async (req, res) => {
@@ -352,15 +606,164 @@ app.get("/admin/orders", async (req, res) => {
   res.json(await OrderModel.find());
 });
 
+app.get("/edit-orders/:id", async (req, res) => {
+  try {
+    const order = await OrderModel.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({
+        error: "Order not found",
+      });
+    }
+
+
+
+    res.json(order);
+
+  } catch (err) {
+    console.error("GET ORDER ERROR:", err);
+
+    res.status(500).json({
+      error: "Server error",
+    });
+  }
+});
+
 
 app.put("/admin/update-order/:id", async (req, res) => {
-  const order = await OrderModel.findByIdAndUpdate(
-    req.params.id,
-    { status: req.body.status },
-    { new: true }
-  );
-  res.json(order);
+  try {
+    const { status } = req.body;
+
+    console.log("Incoming status:", status);
+
+    const order = await OrderModel.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    const updateData = {
+      status: status,
+    };
+
+    if (status === "Delivered") {
+      updateData.paymentStatus = "Paid";
+    }
+
+    const updatedOrder = await OrderModel.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    // Email conditions
+    const allowedStatuses = ["Processed", "Delivered", "Pending"];
+
+    if (allowedStatuses.includes(status)) {
+      const subject = `Order Update: ${status}`;
+
+      const message = `
+        <h2>Order Status Update</h2>
+        <p>Your order status is: <strong>${status}</strong></p>
+        <p>Thank you for shopping with us.</p>
+      `;
+
+      console.log("Sending email to:", order.email);
+
+      try {
+        if (order.email) {
+          await sgMail.send({
+            to: order.email,
+            from: process.env.EMAIL_FROM,
+            subject,
+            html: message,
+          });
+
+          console.log("Email sent successfully");
+        } else {
+          console.log("No email found for order");
+        }
+      } catch (err) {
+        console.error(
+          "SENDGRID ERROR:",
+          err.response?.body || err.message
+        );
+      }
+    }
+
+    res.json({
+      message: "Order updated successfully",
+      order: updatedOrder,
+    });
+  } catch (err) {
+    console.error("Order update error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
 });
+
+
+// app.put("/admin/update-order/:id", async (req, res) => {
+//   // const order = await OrderModel.findByIdAndUpdate(
+//   //   req.params.id,
+//   //   { status: req.body.status },
+//   //   { new: true }
+//   // );
+//   // res.json(order);
+
+
+//   try {
+//     const { status } = req.body;
+//     const updateData = { status }; 
+//     if (status === "Delivered") {
+//       updateData.paymentStatus = "Paid";
+//     }
+//     const order = await OrderModel.findByIdAndUpdate(
+//       req.params.id, 
+//       updateData, 
+//       { new: true }
+//     );
+
+//     if (!order) {
+//       return res.status(404).json({ message: "Order not found" });
+//     }
+    
+//     if (status === "Processed" || status === "Delivered"|| status === "Pending") {
+//       const amount = order.totalPrice;
+//       const date = new Date(order.datetime).toLocaleString("en-IN", {
+//            timeZone: "Asia/Kolkata",
+//            hour12: false,
+//          });
+     
+//       const subject = `Order Update: ${status}`;  
+//       const message = `
+//         <h2><strong>Order Status Update</strong></h2>
+//         <p>Your order status is: <strong>${status}</strong></p>
+//         <p>Thank you for shopping with Minimalist.</p>
+
+       
+//       `;
+//       // await sendMail(order.email, subject, message);
+//       try{
+//          await sgMail.send({
+//   to: order.email,
+//   from: process.env.EMAIL_FROM,
+//   subject: subject,
+//   html: message,
+// });
+//       }
+//       catch(err){
+//         console.error("Status update email error:", err);
+//       }
+     
+//     }  
+//     res.json({ message: "Order updated and email sent successfully" });
+    
+//   } catch (err) {
+//     console.error("Order update error:", err);
+//     res.status(500).json({ error: "Server error" });
+//   }
+
+// });
 
 
 app.delete("/admin/delete-order/:id", async (req, res) => {
