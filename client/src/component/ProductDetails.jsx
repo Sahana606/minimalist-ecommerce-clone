@@ -11,7 +11,7 @@ function ProductDetails({ addToCart }) {
     const getProduct = async () => {
       try {
         const res = await axios.get(
-          `https://minimalist-ecommerce-clone.onrender.com/products/${id}`
+          `${import.meta.env.VITE_API_URL}/products/${id}`
         );
         setProduct(res.data);
       } catch (err) {
@@ -50,20 +50,20 @@ function ProductDetails({ addToCart }) {
 
        
         <button
-          className="add-btn"
-          onClick={() =>
-            addToCart({
-              id: product._id,
-              name: product.name,
-              price: product.price,
-              desc: product.description,
-              images: product.image,
-              qty: 1
-            })
-          }
-        >
-          ADD TO CART
-        </button>
+  className="add-btn"
+  onClick={() =>
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.price,
+      desc: product.description,
+      image: product.image, 
+      qty: 1
+    })
+  }
+>
+  ADD TO CART
+</button>
 
       </div>
     </div>
