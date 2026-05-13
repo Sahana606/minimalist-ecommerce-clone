@@ -33,7 +33,7 @@ function CartSidebar({ cart = [], setCart, showCart, setShowCart }) {
     }));
 
     try {
-      await axios.post("https://minimalist-ecommerce-clone.onrender.com/place-order", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/place-order`, {
         user_id,
         email,
         items,
