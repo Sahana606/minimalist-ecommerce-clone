@@ -1,8 +1,31 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Slider from "react-slick";
+import { useNavigate } from "react-router-dom";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 function OurBestSeller({ addToCart }) {
+  const [addproducts, setproducts] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getProducts = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/products`
+        );
+
+        setproducts(res.data);
+
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getProducts();
+  }, []);
 
   function ProductPrevArrow({ onClick }) {
     return (
@@ -33,62 +56,6 @@ function OurBestSeller({ addToCart }) {
     nextArrow: <ProductNextArrow />,
   };
 
-  const bestSeller = [
-    {
-      id: 1,
-      images: [
-        "/images/3.avif",
-        "/images/s5.avif",
-        "/images/s2.avif",
-        "/images/s3.avif",
-        "/images/s4.avif",
-      ],
-      name: "Salicylic Acid + LHA 2% Cleanser",
-      desc: "Acne, Breakouts & Oiliness",
-      price: 250,
-      btn: "Add to Cart",
-    },
-    {
-      id: 2,
-      images: [
-        "/images/spf.avif",
-        "/images/s8.avif",
-        "/images/s6.avif",
-        "/images/s7.avif",
-      ],
-      name: "SPF 50 Sunscreen",
-      desc: "Sun protection, UV exposure/damage",
-      price: 370,
-      btn: "Add to Cart",
-    },
-    {
-      id: 3,
-      images: [
-        "/images/Salicylic.avif",
-        "/images/Salicylic-2.avif",
-        "/images/Salicylic-3.avif",
-        "/images/Salicylic-4.avif",
-      ],
-      name: "Salicylic Acid 2% Face Serum",
-      desc: "Acne, Oily skin, Blackheads",
-      price: 200,
-      btn: "Add to Cart",
-    },
-    {
-      id: 4,
-      images: [
-        "/images/Vitamin.avif",
-        "/images/Vitamin-2.avif",
-        "/images/Vitamin-3.avif",
-        "/images/Vitamin-4.avif",
-      ],
-      name: "Vitamin C 10% Face Serum",
-      desc: "Dullness, Spots & Elasticity",
-      price: 250,
-      btn: "Add to Cart",
-    },
-  ];
-
   return (
     <>
       <div id="shopby">
@@ -96,58 +63,69 @@ function OurBestSeller({ addToCart }) {
       </div>
 
       <div className="productscontainer">
+        {Array.isArray(addproducts) &&
+          addproducts
+            .filter(
+              (product) =>
+                product.section === "bestseller"
+            )
+            .map((product) => (
+              <div
+                className="productcard"
+                key={product._id}
+                onClick={() =>
+                  navigate(`/product/${product._id}`)
+                }
+              >
+                <div className="productimagewrapper">
+                  <Slider {...productImageSettings}>
+                    {(product.images || [
+                      product.image,
+                    ]).map((img, index) => (
+                      <div key={index}>
+                        <img
+                          src={img}
+                          alt={product.name}
+                          className="productimg"
+                        />
+                      </div>
+                    ))}
+                  </Slider>
+                </div>
 
-        {bestSeller.map((item) => (
+                <h4 className="product-name">
+                  <b>{product.name}</b>
+                </h4>
 
-          <div className="productcard" key={item.id}>
+                <p className="product-desc">
+                  {product.description}
+                </p>
 
-            <div className="productimagewrapper">
+                <h3>
+                  On Sale from ₹{product.price}
+                </h3>
 
-              <Slider {...productImageSettings}>
+                <button
+                  className="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
 
-                {item.images.map((img, index) => (
-
-                  <div key={index}>
-                    <img
-                      src={img}
-                      alt={item.name}
-                      className="productimg"
-                    />
-                  </div>
-
-                ))}
-
-              </Slider>
-
-            </div>
-
-            <h4 className="product-name">
-              <b>{item.name}</b>
-            </h4>
-
-            <p className="product-desc">
-              {item.desc}
-            </p>
-
-            <h3>
-              On Sale from {item.price}
-            </h3>
-         <button
-  className="button"
-  onClick={() => addToCart(item)}
->
-  Add to Cart
-</button>
-
-
-          </div>
-
-        ))}
-
+                    addToCart({
+                      ...product,
+                      images:
+                        product.images || [
+                          product.image,
+                        ],
+                    });
+                  }}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            ))}
       </div>
     </>
   );
 }
 
 export default OurBestSeller;
-
