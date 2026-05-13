@@ -12,7 +12,7 @@ function EditUser() {
     useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get("https://minimalist-ecommerce-clone.onrender.com/admin/manage-users");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/manage-users`);
         const user = res.data.find(u => u._id === id);
         if (user) setEmail(user.email);
         setLoading(false);
@@ -27,7 +27,7 @@ function EditUser() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`https://minimalist-ecommerce-clone.onrender.com/update-user/${id}`, { email });
+      await axios.put(`${import.meta.env.VITE_API_URL}/admin/update-user/${id}`, { email });
       alert("User updated successfully");
       navigate("/admin/manage-users");
     } catch (err) {
