@@ -9,7 +9,7 @@ function ManageOrder() {
   useEffect(() => {
     const getOrders = async () => {
       try {
-        const res = await axios.get("https://minimalist-ecommerce-clone.onrender.com/admin/orders");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/admin/orders`);
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -20,7 +20,7 @@ function ManageOrder() {
 
   const deleteOrder = async (orderId) => {
     try {
-      await axios.delete(`https://minimalist-ecommerce-clone.onrender.com/admin/delete-order/${orderId}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/delete-order/${orderId}`);
       setOrders(prev => prev.filter(o => o._id !== orderId));
     } catch (err) {
       console.error("Error deleting order:", err);
@@ -63,11 +63,11 @@ function ManageOrder() {
                 <td>
                   
                   <button
-                    className="edit-btn"
-                    onClick={() => navigate(`/admin/user-orders/${o._id}`)}
-                  >
-                    <i className="fas fa-edit"></i>
-                  </button>
+  className="edit-btn"
+  onClick={() => navigate(`/admin/edit-order/${o._id}`)}
+>
+  <i className="fas fa-edit"></i>
+</button>
 
                   <button
                     className="delete-btn"
