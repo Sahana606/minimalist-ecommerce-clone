@@ -24,16 +24,29 @@ function buildPDF(order, dataCallback, endCallback) {
   const paymentMethod = order.paymentMethod;
   const paymentStatus = paymentMethod === "COD" ? "Pending" : "Paid";
 
-  const logoPath = path.join(__dirname, "images", "bighaat-logo.png");
-  doc.image(logoPath, 50, 45, { width: 150 });
+  const fs = require("fs");
 
-  doc.fontSize(10).font("Helvetica-Bold").text("Corporate Office:", 350, 45);
-  doc.font("Helvetica").fontSize(9);
-  doc.text("BigHaat Agro Pvt Ltd", 350, 58);
-  doc.text("19/2, SKR Tower, 15th Cross, 4th Phase,", 350, 70);
-  doc.text("Dollars Layout, J.P.Nagar, Bangalore - 560078", 350, 82);
-  doc.text("Karnataka, India", 350, 94);
-  doc.text("CIN: U74900KA2015PTC082769", 350, 106);
+//   const logoPath = path.join(__dirname, "images", "Minimalist.webp");
+
+// if (fs.existsSync(logoPath)) {
+//   doc.image(logoPath, 50, 45, { width: 150 });
+// }
+
+doc.image('./image/img1.png', 50, 45, { width: 100 })
+  .text("Minimalist Pvt Ltd", 350, 58)
+  .text("19/2, SKR Tower, 15th Cross, 4th Phase,", 350, 70)
+  .text("Dollars Layout, J.P.Nagar, Bangalore - 560078", 350, 82)
+  .text("Karnataka, India", 350, 94)
+  .text("CIN: U74900KA2015PTC082769", 350, 106)
+  .moveDown()  
+
+  // doc.fontSize(10).font("Helvetica-Bold").text("Corporate Office:", 350, 45);
+  // doc.font("Helvetica").fontSize(9);
+  // doc.text("Minimalist Pvt Ltd", 350, 58);
+  // doc.text("19/2, SKR Tower, 15th Cross, 4th Phase,", 350, 70);
+  // doc.text("Dollars Layout, J.P.Nagar, Bangalore - 560078", 350, 82);
+  // doc.text("Karnataka, India", 350, 94);
+  // doc.text("CIN: U74900KA2015PTC082769", 350, 106);
 
   doc.moveTo(50, 135).lineTo(545, 135).stroke("#cccccc");
 
@@ -77,7 +90,7 @@ function buildPDF(order, dataCallback, endCallback) {
   doc.font("Helvetica").text(gstin, col2ValueX, gridY + 54);
 
   doc.font("Helvetica-Bold").text("Support:", col2X, gridY + 72);
-  doc.font("Helvetica").text("support@bighaat.com", col2ValueX, gridY + 72);
+  doc.font("Helvetica").text("support@minimalist.com", col2ValueX, gridY + 72);
 
   doc.font("Helvetica-Bold").text("Phone:", col2X, gridY + 90);
   doc.font("Helvetica").text("+91 9876543210", col2ValueX, gridY + 90);
@@ -118,7 +131,7 @@ function buildPDF(order, dataCallback, endCallback) {
   doc.font("Helvetica").fontSize(9);
 
   order.items.forEach((item) => {
-    const price = Number(item.snapPrice);
+    const price = Number(item.price);
     const qty = Number(item.quantity);
 
     const lineTotal = price * qty;
@@ -132,9 +145,9 @@ function buildPDF(order, dataCallback, endCallback) {
     totalSubtotal += base;
     totalGST_Acc += gst;
 
-    const nameHeight = doc.heightOfString(item.snapName, { width: 120 });
+    const nameHeight = doc.heightOfString(item.productName, { width: 120 });
 
-    doc.text(item.snapName, 60, itemY, { width: 120 });
+    doc.text(item.productName, 60, itemY, { width: 120 });
     doc.text(qty.toString(), 185, itemY, { width: 30, align: "center" });
     doc.text(price.toFixed(2), 220, itemY, { width: 60, align: "right" });
     doc.text(base.toFixed(2), 285, itemY, { width: 60, align: "right" });
@@ -178,7 +191,7 @@ function buildPDF(order, dataCallback, endCallback) {
   });
 
   doc.fontSize(10).font("Helvetica").fillColor("#333333");
-  doc.text("Thank you for shopping with BigHaat!", 50, 730, {
+  doc.text("Thank you for shopping with minimalist!", 50, 730, {
     align: "center",
   });
 
